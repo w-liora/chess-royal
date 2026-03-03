@@ -42,7 +42,7 @@ public abstract class Piece {
 	//Méthodes abstraites donnant les déplacements possibles selon le plateau
 	//Attention : il s'agit bien d'un plateau de cases. Pensez à récupérer la pièce présente sur chaque case,
 	//et vérifier si elle est égale à null.
-	public abstract Position[] getPossibleMoves(Square[] board);
+	public abstract Position[] getPossibleMoves(Square[][] board);
 	
 	
 	//se déplace vers une nouvelle case
