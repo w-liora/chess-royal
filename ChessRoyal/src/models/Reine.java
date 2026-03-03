@@ -50,5 +50,6 @@ public class Reine extends Piece{
 		}
 		
 		return possibleMoves.toArray(new Position[0]);
-	}	
+	}
+	
 }
