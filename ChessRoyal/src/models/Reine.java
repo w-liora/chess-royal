@@ -27,7 +27,8 @@ public class Reine extends Piece{
 			
 			//boucle qui teste toutes les possibilités tant que l'on reste dans les limites du plateau
 			// Avec board.length qui représente le nb de col et row sur notre échéquier de taille extensible
-			while (newRow >= 0 && newRow < board.length && newCol >= 0 && newCol < board.length) {
+			// dans la condition 0 et board.length sont au cas ou on a rajouter des colones sinon avoir une case en null suffit à bloquer une ligne de déplacement
+			while (newRow >= 0 && newRow < board.length && newCol >= 0 && newCol < board.length && board[newRow][newCol] != null) {
 				Square testedSquare = board[newRow][newCol];
 				
 				if (testedSquare.getPiece() == null) {
