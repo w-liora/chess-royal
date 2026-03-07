@@ -1,5 +1,6 @@
 package models;
 import java.util.ArrayList;
+import java.lang.Math;
 
 /*
  * Cette classe implémente un pion sur le plateau d'échec
@@ -49,33 +50,53 @@ public class Pawn extends Piece {
 			if (y>0) { //On regarde s'il existe une case à gauche du pion (et donc devant à gauche)
 				Square leftFrontSquare = board[x+dir][y-1]; //On récupère cette case
 				if (leftFrontSquare != null) {
-					Piece leftPiece = leftFrontSquare.getPiece(); //On récupère la pièce potentielle sur cette case
-					if (leftPiece != null && leftPiece.getColor()!=col) { //Le pion ne peut s'y déplacer qui s'il capture
+					Piece leftFrontPiece = leftFrontSquare.getPiece(); //On récupère la pièce potentielle sur cette case
+					if (leftFrontPiece != null && leftFrontPiece.getColor()!=col) { //Le pion ne peut s'y déplacer qui s'il capture
 						res.add(new Position(x+dir, y-1));
 					}
 				}
+				
+				//On gère maintenant le "en passant" à gauche
+				Square leftSquare = board[x][y-1]; 
+				if (leftSquare != null) {
+					Piece leftPiece = leftSquare.getPiece(); //On récupère la pièce à gauche du pion
+					//On vérifie si le pièce est un pion de couleur différente s'étant déplacer de deux cases
+					if (leftPiece instanceof Pawn && leftPiece.getColor() != col && Math.abs(leftPiece.getPrevRow() - leftPiece.getRow()) == 2 ) {
+						res.add(new Position(x+dir,y-1));
+					}
+				}
+				
 			}
 			
 			
 			if (y<board.length-1) { //On regarde s'il existe une case à droite du pion
 				Square rightFrontSquare = board[x+dir][y+1]; //On récupère cette case
 				if (rightFrontSquare != null) {
-					Piece rightPiece = rightFrontSquare.getPiece(); //On récupère la pièce potentielle sur cette case
-					if (rightPiece != null && rightPiece.getColor()!=col) { //Le pion ne peut s'y déplacer qui s'il capture
+					Piece rightFrontPiece = rightFrontSquare.getPiece(); //On récupère la pièce potentielle sur cette case
+					if (rightFrontPiece != null && rightFrontPiece.getColor()!=col) { //Le pion ne peut s'y déplacer qui s'il capture
 						res.add(new Position(x+dir, y+1));
+					}
+				}
+				
+				//On gère maintenant le "en passant" à droite
+				Square rightSquare = board[x][y+1]; 
+				if (rightSquare != null) {
+					Piece rightPiece = rightSquare.getPiece(); //On récupère la pièce à droite du pion
+					//On vérifie si le pièce est un pion de couleur différente s'étant déplacer de deux cases
+					if (rightPiece instanceof Pawn && rightPiece.getColor() != col && Math.abs(rightPiece.getPrevRow() - rightPiece.getRow()) == 2 ) {
+						res.add(new Position(x+dir,y+1));
 					}
 				}
 			}
 			
+			
 			if (canMoveTwo && x+2*dir >= 0 && x+2*dir < board.length) { 
 			//Si le pion peut se déplacer de deux case et que cette case existe
-				
 				Square secondFrontSquare = board[x+2*dir][y]; //On récupère cette case
 				if (secondFrontSquare != null && secondFrontSquare.getPiece()==null) { //Le pion ne peut s'y déplacer qui si elle est vide
 					res.add(new Position(x+2*dir, y));
 				}
 			}
-			
 		}
 	
 		return res.toArray(new Position[0]); //On renvoie la liste
