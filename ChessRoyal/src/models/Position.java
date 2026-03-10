@@ -27,4 +27,19 @@ public class Position {
 		return column;
 	}
 	
+	//Test d'égalité de deux positions (égalité de la ligne et de la colonne)
+	public boolean equals(Object o) {
+		if (o instanceof Position) {
+			Position pos = (Position) o;
+			if (pos.row == row && pos.column == column) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+	}
 }
