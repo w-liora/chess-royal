@@ -60,8 +60,9 @@ public class Pawn extends Piece {
 				Square leftSquare = board[x][y-1]; 
 				if (leftSquare != null) {
 					Piece leftPiece = leftSquare.getPiece(); //On récupère la pièce à gauche du pion
-					//On vérifie si le pièce est un pion de couleur différente s'étant déplacer de deux cases
-					if (leftPiece instanceof Pawn && leftPiece.getColor() != col && Math.abs(leftPiece.getPrevRow() - leftPiece.getRow()) > 1 ) {
+					//On vérifie si le pièce est un pion de couleur différente s'étant déplacé d'au moins deux cases verticalement
+					if (leftPiece instanceof Pawn && leftPiece.getColor() != col && Math.abs(leftPiece.getPrevRow() - leftPiece.getRow()) > 1 
+							&& leftPiece.getPrevCol() == leftPiece.getCol()) {
 						res.add(new Position(x+dir,y-1));
 					}
 				}
@@ -82,8 +83,9 @@ public class Pawn extends Piece {
 				Square rightSquare = board[x][y+1]; 
 				if (rightSquare != null) {
 					Piece rightPiece = rightSquare.getPiece(); //On récupère la pièce à droite du pion
-					//On vérifie si le pièce est un pion de couleur différente s'étant déplacer de deux cases
-					if (rightPiece instanceof Pawn && rightPiece.getColor() != col && Math.abs(rightPiece.getPrevRow() - rightPiece.getRow()) > 1 ) {
+					//On vérifie si le pièce est un pion de couleur différente s'étant déplacé d'au moins deux cases verticalement
+					if (rightPiece instanceof Pawn && rightPiece.getColor() != col && Math.abs(rightPiece.getPrevRow() - rightPiece.getRow()) > 1 
+							&& rightPiece.getPrevCol() == rightPiece.getCol()) {
 						res.add(new Position(x+dir,y+1));
 					}
 				}
