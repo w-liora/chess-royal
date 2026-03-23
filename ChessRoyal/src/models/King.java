@@ -2,11 +2,14 @@ package models;
 import java.util.ArrayList;
 
 public class King extends Piece {
-	int a_bouge; //0 si le roi n'a pas bougé depuis le début, 1 sinon 
+	int did_move; //0 si le roi n'a pas bougé depuis le début, 1 sinon 
 	public King(Position pos, int col) {
 		super(pos, col);	
-		a_bouge=0;
+		did_move=0;
 	}
+	
+	
+	
 	
 	@Override
 	public Position[] getPossibleMoves(Square[][] board) { //REMARQUE : quand le roi bouge, il faut mettre son attribut a_bouge à 1 (utile pour la fonction de roque)
@@ -30,13 +33,56 @@ public class King extends Piece {
 					}
 				}
 			}
+		if(did_move==0) {
+			int couleur = this.getColor(); 
+			if(couleur ==1 ){//si le roi est noir
+				Piece coin1 = board[2][2].getPiece();
+				if (coin1 instanceof Rook){
+					if(this.canCastle(board,(Rook) coin1)) {
+						Position pos = new Position(2, 4);
+						cases_dispo.add(pos);				
+					}
+				}
+				Piece coin2 = board[2][9].getPiece();
+				if (coin2 instanceof Rook){
+					if(this.canCastle(board,(Rook) coin2)) {
+						Position pos = new Position(2, 8);
+						cases_dispo.add(pos);				
+					}
+				}
+			}
+			if(couleur ==0 ){//si le roi est blanc
+				Piece coin3 = board[9][2].getPiece();
+				if (coin3 instanceof Rook){
+					if(this.canCastle(board,(Rook) coin3)) {
+						Position pos = new Position(9, 4);
+						cases_dispo.add(pos);				
+					}
+				}
+				Piece coin4 = board[9][9].getPiece();
+				if (coin4 instanceof Rook){
+					if(this.canCastle(board,(Rook) coin4)) {
+						Position pos = new Position(9, 8);
+						cases_dispo.add(pos);				
+					}
+				}
+			}
+			
+			
+		}
+		
 		return cases_dispo.toArray(new Position[0]);
 		}
 	
 	
+	public void moveTo(Position newPos) {
+		super.moveTo(newPos);
+		did_move=1;
+	}
 	
-	public boolean canRoque(Square[][] board, Rook tour) {//Renvoie vrai si le roi peut roquer avec la tour donnée en argument, faux sinon
-		if (a_bouge == 0 && tour.a_bouge ==0) { //On vérifie que le roi et la tour concernée n'ont jamais bougé 
+	
+	public boolean canCastle(Square[][] board, Rook tour) {//Renvoie vrai si le roi peut roquer avec la tour donnée en argument, faux sinon
+		if (did_move == 0 && tour.did_move ==0) { //On vérifie que le roi et la tour concernée n'ont jamais bougé 
 			int colonneCur = tour.getCol();
 			int ligne=tour.getRow();
 			int deplacement;

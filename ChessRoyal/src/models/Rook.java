@@ -3,10 +3,16 @@ package models;
 import java.util.ArrayList;
 
 public class Rook extends Piece{
-	int a_bouge; //0 si le roi n'a pas bougé depuis le début, 1 sinon 
+	int did_move; //0 si le roi n'a pas bougé depuis le début, 1 sinon 
 	public Rook(Position pos, int col) {
 		super(pos, col);
-		a_bouge=0;
+		did_move=0;
+	}
+	
+	
+	public void moveTo(Position newPos) {
+		super.moveTo(newPos);
+		did_move=1;
 	}
 	
 	
