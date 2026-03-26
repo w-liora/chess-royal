@@ -18,9 +18,9 @@ public class Pawn extends Piece {
 	}
 	
 	//Redéfinition de la méthode moveTo pour retirer la capacité de se déplacer de deux cases
-	public void moveTo(Position newPos) {
-		super.moveTo(newPos);
+	public void moveTo(Square[][] board, int x, int y) {
 		canMoveTwo = false;
+		super.moveTo(board, x, y);
 	}
 
 	//Donne la liste des cases vers lesquelles le pion peut se déplacer.

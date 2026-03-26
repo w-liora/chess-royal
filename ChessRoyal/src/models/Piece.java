@@ -45,10 +45,16 @@ public abstract class Piece {
 	public abstract Position[] getPossibleMoves(Square[][] board);
 	
 	
-	//se déplace vers une nouvelle case
-	public void moveTo(Position newPos) {
+	//se déplace vers une nouvelle case, en modifiant le plateau
+	public void moveTo(Square[][] board, int x, int y) {
+		//Modifie la plateau correctement
+		board[x][y].setPiece(this);
+		board[pos.getRow()][pos.getCol()].setPiece(null);
+		//Change la position de la pièce
+		Position newPos = new Position(x,y);
 		prevPos = pos;
 		pos = newPos;
+		board[x][y].effect(); //Applique l'effet de la nouvelle case
 	}
 	
 	

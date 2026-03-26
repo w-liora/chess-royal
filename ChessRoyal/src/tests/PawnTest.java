@@ -33,23 +33,19 @@ public class PawnTest {
 		Assertions.assertArrayEquals(board[3][2].getPiece().getPossibleMoves(board), new Position[] {new Position(2,2), new Position(1,2)});
 		
 		//Test de déplacement de pions
-		board[0][0].getPiece().moveTo(new Position(2,0));
-		board[2][0]=board[0][0];
-		board[0][0]=null;
+		board[0][0].getPiece().moveTo(board,2,0);
+		Assertions.assertEquals(null, board[0][0].getPiece());
 		Assertions.assertEquals(2, board[2][0].getPiece().getRow());
 		Assertions.assertEquals(0, board[2][0].getPiece().getCol());
-		board[3][1].getPiece().moveTo(new Position(2,1));
-		board[2][1] = board[3][1];
-		board[3][1] = null;
+		board[3][1].getPiece().moveTo(board, 2, 1);
 		
 		//Second test de déplacment possibles, incluant un en passant
 		Assertions.assertArrayEquals(board[2][0].getPiece().getPossibleMoves(board), new Position[] {});
 		Assertions.assertArrayEquals(board[2][1].getPiece().getPossibleMoves(board), new Position[] {new Position(1,1), new Position(1,0)});
 		
 		//Second test de déplacement afin de tester les posiions précédentes
-		board[2][1].getPiece().moveTo(new Position(1,1));
-		board[1][1]=board[2][1];
-		board[2][1]=null;
+		board[2][1].getPiece().moveTo(board, 1, 1);
+
 		Assertions.assertEquals(2, board[1][1].getPiece().getPrevRow());
 		Assertions.assertEquals(1, board[1][1].getPiece().getPrevCol());
 	}

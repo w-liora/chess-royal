@@ -10,9 +10,9 @@ public class Rook extends Piece{
 	}
 	
 	
-	public void moveTo(Position newPos) {
-		super.moveTo(newPos);
+	public void moveTo(Square[][] board, int x, int y) {
 		did_move=1;
+		super.moveTo(board, x, y);
 	}
 	
 	
