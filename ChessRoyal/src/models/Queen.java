@@ -3,10 +3,11 @@ package models;
 import java.util.ArrayList;
 
 public class Queen extends Piece{
-	public char symbol = 'Q'; //Le symbole utilisé dans la version textuelle
+	
 	// Constructeur
 	public Queen(Position pos, int col) {
 		super(pos, col);
+		symbol = 'Q';
 	}
 	
 	// Méthode de déplacement

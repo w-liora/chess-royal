@@ -4,11 +4,10 @@ import java.util.ArrayList;
 
 public class Knight extends Piece{
 	
-	public char symbol = 'N'; //Le symbole utilisé dans la version textuelle
-	
 	//Constructeur
 	public Knight(Position pos, int col) {
 		super(pos, col);
+		symbol = 'N';
 	}
 
 	// Méthode de déplacement

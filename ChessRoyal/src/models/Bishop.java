@@ -4,11 +4,10 @@ import java.util.ArrayList;
 
 public class Bishop extends Piece{
 	
-	public char symbol = 'B'; //Le symbole utilisé dans la version textuelle
-	
 	// Constructeur
 	public Bishop(Position pos, int col) {
 		super(pos, col);
+		symbol = 'B';
 	}
 	
 	// Méthode de déplacement

@@ -9,6 +9,7 @@ public abstract class Piece {
 	private Position pos; //Position de la pièce
 	private Position prevPos; //Position précédente de la pièce
 	private int color;	//0 pour les blancs, 1 pour les noirs
+	public char symbol; //Le symbole utilisé dans la version textuelle
 	
 	public Piece(Position pos, int col) {
 		this.pos = pos;
