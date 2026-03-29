@@ -35,42 +35,24 @@ public class King extends Piece {
 					}
 				}
 			}
+		//On gère ici le roque
 		if(did_move==0) {
-			int couleur = this.getColor(); 
-			if(couleur ==1 ){//si le roi est noir
-				Piece coin1 = board[2][2].getPiece();
-				if (coin1 instanceof Rook){
-					if(this.canCastle(board,(Rook) coin1)) {
-						Position pos = new Position(2, 4);
-						cases_dispo.add(pos);				
-					}
-				}
-				Piece coin2 = board[2][9].getPiece();
-				if (coin2 instanceof Rook){
-					if(this.canCastle(board,(Rook) coin2)) {
-						Position pos = new Position(2, 8);
-						cases_dispo.add(pos);				
-					}
+			//Pour un grand roque
+			Piece coin1 = board[super.getRow()][super.getCol()-4].getPiece();
+			if (coin1 instanceof Rook){
+				if(this.canCastle(board,(Rook) coin1)) {
+					Position pos = new Position(super.getRow(), super.getCol()-2);
+					cases_dispo.add(pos);				
 				}
 			}
-			if(couleur ==0 ){//si le roi est blanc
-				Piece coin3 = board[9][2].getPiece();
-				if (coin3 instanceof Rook){
-					if(this.canCastle(board,(Rook) coin3)) {
-						Position pos = new Position(9, 4);
-						cases_dispo.add(pos);				
-					}
-				}
-				Piece coin4 = board[9][9].getPiece();
-				if (coin4 instanceof Rook){
-					if(this.canCastle(board,(Rook) coin4)) {
-						Position pos = new Position(9, 8);
-						cases_dispo.add(pos);				
-					}
+			//Pour un petit roque
+			Piece coin2 = board[super.getRow()][super.getCol()+3].getPiece();
+			if (coin2 instanceof Rook){
+				if(this.canCastle(board,(Rook) coin2)) {
+					Position pos = new Position(super.getRow(), super.getCol()+2);
+					cases_dispo.add(pos);				
 				}
 			}
-			
-			
 		}
 		
 		return cases_dispo.toArray(new Position[0]);
