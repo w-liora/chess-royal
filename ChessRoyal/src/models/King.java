@@ -2,7 +2,9 @@ package models;
 import java.util.ArrayList;
 
 public class King extends Piece {
+	public char symbol = 'K'; //Le symbole utilisé dans la version textuelle
 	int did_move; //0 si le roi n'a pas bougé depuis le début, 1 sinon 
+	
 	public King(Position pos, int col) {
 		super(pos, col);	
 		did_move=0;

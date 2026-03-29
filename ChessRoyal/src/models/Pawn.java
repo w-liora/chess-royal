@@ -7,7 +7,7 @@ import java.lang.Math;
  */
 
 public class Pawn extends Piece {
-
+	public char symbol = 'p'; //Le symbole utilisé dans la version textuelle
 	private boolean canMoveTwo; //Indique si le pion peut se déplacer de deux cases
 								//(ce qui est vrai pour le premier mouvement)
 	

@@ -2,10 +2,12 @@ package models;
 
 import java.util.ArrayList;
 
-public class Cavalier extends Piece{
+public class Knight extends Piece{
+	
+	public char symbol = 'N'; //Le symbole utilisé dans la version textuelle
 	
 	//Constructeur
-	public Cavalier(Position pos, int col) {
+	public Knight(Position pos, int col) {
 		super(pos, col);
 	}
 

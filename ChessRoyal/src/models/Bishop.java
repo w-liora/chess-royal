@@ -2,10 +2,12 @@ package models;
 
 import java.util.ArrayList;
 
-public class Reine extends Piece{
+public class Bishop extends Piece{
+	
+	public char symbol = 'B'; //Le symbole utilisé dans la version textuelle
 	
 	// Constructeur
-	public Reine(Position pos, int col) {
+	public Bishop(Position pos, int col) {
 		super(pos, col);
 	}
 	
@@ -14,12 +16,12 @@ public class Reine extends Piece{
 		
 		ArrayList<Position> possibleMoves = new ArrayList<>(); // liste des cases accessibles
 		
-		// On récupère la position de la reine
+		// On récupère la position du fou
 		int currentRow = this.getRow();
 		int currentCol = this.getCol();
 		
-		//Huit directions qui correspondes aux diagonales (hg, hd, bd, bg) et haut, bas, gauche, droite
-		int[][] directions = {{-1, -1}, {-1, 1}, {1, 1}, {1, -1}, {1, 0}, {-1, 0}, {0, -1}, {0, 1}};
+		//Quatre directions qui correspondes aux diagonales (hg, hd, bd, bg)
+		int[][] directions = {{-1, -1}, {-1, 1}, {1, 1}, {1, -1}};
 		
 		for (int[] dir: directions) {
 			int newRow = currentRow + dir[0];
