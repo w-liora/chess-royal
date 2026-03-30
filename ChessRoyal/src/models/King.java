@@ -65,7 +65,7 @@ public class King extends Piece {
 			board[this.getRow()][this.getCol()+3].getPiece().moveTo(board, x, y-1);
 		}
 		if (y-this.getCol() == -2) {
-			board[this.getRow()][this.getCol()+3].getPiece().moveTo(board, x, y+1);
+			board[this.getRow()][this.getCol()-4].getPiece().moveTo(board, x, y+1);
 		}
 		super.moveTo(board, x, y);
 	}
