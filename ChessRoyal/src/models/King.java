@@ -61,6 +61,12 @@ public class King extends Piece {
 	
 	public void moveTo(Square[][] board, int x, int y) {
 		did_move=1;
+		if (x-this.getCol() ==2) { //On déplace la tour s'il s'agit d'un roque
+			board[this.getRow()][this.getCol()+3].getPiece().moveTo(board, x, y-1);
+		}
+		if (x-this.getCol() == -2) {
+			board[this.getRow()][this.getCol()+3].getPiece().moveTo(board, x, y+1);
+		}
 		super.moveTo(board, x, y);
 	}
 	
