@@ -17,12 +17,22 @@ public class Pawn extends Piece {
 		canMoveTwo = true;
 	}
 	
-	//Redéfinition de la méthode moveTo pour retirer la capacité de se déplacer de deux cases
+	//Redéfinition de la méthode moveTo pour retirer la capacité de se déplacer de deux cases, et gérer le en passant
 	public void moveTo(Square[][] board, int x, int y) {
 		canMoveTwo = false;
+		//On regarde si le pion a réalisé un en passant
+		if (Math.abs(this.getCol() - y) == 1 && Math.abs(this.getRow() - x) == 1 && board[x][y].getPiece() == null && board[getRow()][y]!=null && this.canEnPassant(board[getRow()][y].getPiece())) {
+			board[getRow()][y].setPiece(null);
+		}
 		super.moveTo(board, x, y);
 	}
 
+	//Indique si ce pion peut effectuer une prise en passant sur la pièce p
+	private boolean canEnPassant(Piece p) {
+		//On regarde si la pièce est un pion de couleur différente qui vient de se déplacer d'au moins 2 cases verticalement
+		return p instanceof Pawn && p.justMoved && p.getColor() != this.getColor() && Math.abs(p.getPrevRow() - p.getRow()) > 1 && p.getPrevCol() == p.getCol();
+	}
+	
 	//Donne la liste des cases vers lesquelles le pion peut se déplacer.
 	public Position[] getPossibleMoves(Square[][] board) {
 		
@@ -60,9 +70,8 @@ public class Pawn extends Piece {
 				Square leftSquare = board[x][y-1]; 
 				if (leftSquare != null) {
 					Piece leftPiece = leftSquare.getPiece(); //On récupère la pièce à gauche du pion
-					//On vérifie si le pièce est un pion de couleur différente s'étant déplacé d'au moins deux cases verticalement
-					if (leftPiece instanceof Pawn && leftPiece.getColor() != col && Math.abs(leftPiece.getPrevRow() - leftPiece.getRow()) > 1 
-							&& leftPiece.getPrevCol() == leftPiece.getCol()) {
+					//On l'ajoute si la prise est possible
+					if (this.canEnPassant(leftPiece)) {
 						res.add(new Position(x+dir,y-1));
 					}
 				}
@@ -83,9 +92,8 @@ public class Pawn extends Piece {
 				Square rightSquare = board[x][y+1]; 
 				if (rightSquare != null) {
 					Piece rightPiece = rightSquare.getPiece(); //On récupère la pièce à droite du pion
-					//On vérifie si le pièce est un pion de couleur différente s'étant déplacé d'au moins deux cases verticalement
-					if (rightPiece instanceof Pawn && rightPiece.getColor() != col && Math.abs(rightPiece.getPrevRow() - rightPiece.getRow()) > 1 
-							&& rightPiece.getPrevCol() == rightPiece.getCol()) {
+					//On l'ajoute si la prise est possible
+					if (this.canEnPassant(rightPiece)) {
 						res.add(new Position(x+dir,y+1));
 					}
 				}

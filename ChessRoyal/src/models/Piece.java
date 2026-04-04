@@ -10,8 +10,10 @@ public abstract class Piece {
 	private Position prevPos; //Position précédente de la pièce
 	private int color;	//0 pour les blancs, 1 pour les noirs
 	public char symbol; //Le symbole utilisé dans la version textuelle
+	public boolean justMoved; //Indique si cette pièce est la dernière à s'être déplacée
 	
 	public Piece(Position pos, int col) {
+		this.justMoved = false;
 		this.pos = pos;
 		this.prevPos = pos;
 		color = col;
@@ -55,6 +57,16 @@ public abstract class Piece {
 		Position newPos = new Position(x,y);
 		prevPos = pos;
 		pos = newPos;
+		//Cette pièce est maintenant la dernière à s'être déplacée
+		int l = board.length;
+		for (int i=0; i<l; i++) {
+			for (int j=0; j<l; j++) {
+				if (board[i][j] != null && board[i][j].getPiece()!=null) {
+					board[i][j].getPiece().justMoved = false;
+				}
+			}
+		}
+		justMoved = true;
 		board[x][y].effect(); //Applique l'effet de la nouvelle case
 	}
 	
