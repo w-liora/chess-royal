@@ -36,23 +36,29 @@ public class King extends Piece {
 				}
 			}
 		//On gère ici le roque
-		if(did_move==0) {
-			//Pour un grand roque
-			Piece coin1 = board[super.getRow()][super.getCol()-4].getPiece();
-			if (coin1 instanceof Rook){
-				if(this.canCastle(board,(Rook) coin1)) {
-					Position pos = new Position(super.getRow(), super.getCol()-2);
-					cases_dispo.add(pos);				
-				}
-			}
-			//Pour un petit roque
-			Piece coin2 = board[super.getRow()][super.getCol()+3].getPiece();
-			if (coin2 instanceof Rook){
-				if(this.canCastle(board,(Rook) coin2)) {
-					Position pos = new Position(super.getRow(), super.getCol()+2);
-					cases_dispo.add(pos);				
-				}
-			}
+		if (did_move == 0) {
+		    int row = this.getRow();
+		    int col = this.getCol();
+
+		    // grand roque
+		    if (col - 4 >= 0) {
+		        Piece coin1 = board[row][col - 4].getPiece();
+		        if (coin1 instanceof Rook) {
+		            if (this.canCastle(board, (Rook) coin1)) {
+		                cases_dispo.add(new Position(row, col - 2));
+		            }
+		        }
+		    }
+
+		    // petit roque
+		    if (col + 3 < board[0].length) {
+		        Piece coin2 = board[row][col + 3].getPiece();
+		        if (coin2 instanceof Rook) {
+		            if (this.canCastle(board, (Rook) coin2)) {
+		                cases_dispo.add(new Position(row, col + 2));
+		            }
+		        }
+		    }
 		}
 		
 		return cases_dispo.toArray(new Position[0]);
