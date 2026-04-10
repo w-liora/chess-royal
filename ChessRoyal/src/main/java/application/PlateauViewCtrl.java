@@ -366,53 +366,11 @@ public class PlateauViewCtrl implements javafx.fxml.Initializable {
 	 * @param etatPlateau
 	 */
 	private void initCanvas(final EtatPlateau etatPlateau) {
-		int nbCases = etatPlateau.getPlateau().getNbCasesPlateau();
-		int nbBranches = (nbCases / ConfigVue.NB_CASES_BRANCHE) + 1;
-		int hauteur = 2 * ConfigVue.MARGE_HAUTEUR + 2 * ConfigVue.TAILLE_CASES * nbBranches;
-		int largeur = 2 * ConfigVue.MARGE_LARGEUR + ConfigVue.TAILLE_CASES * ConfigVue.NB_CASES_LIGNE;
-
-
-		// Mise en place de la partie console
-		texteConsole.setMinWidth(ConfigVue.CONSOLE_LARGEUR);
-		texteConsole.setMinHeight(hauteur);
+		
 
 
 		// Canvas partie centrale (le dessin du plateau)
-		CTRL.trace("CourseViewCtrl::initCanvas hauteur =" + hauteur + ".");
-
-		canvasPlateau = new Canvas(largeur, hauteur);
-		// pour que les events claviers soient visibles par le canvas
-		// canvas.setFocusTraversable(true); pas besoin pour ce cas
-		gcPlateau = canvasPlateau.getGraphicsContext2D();
-
-		hboxPlateau.getChildren().add(canvasPlateau);
-
-
-		// Canvas partie basse (les dés, et les interactions avec les joueurs)
-		bottomPanel = new AnchorPane();
-		bottomPanel.setMinWidth(ConfigVue.MARGE_LARGEUR  + ConfigVue.LARGEUR_BRANCHE + ConfigVue.MARGE_LARGEUR * 2);
-		bottomPanel.setMinHeight(ConfigVue.BOTTOM_HAUTEUR);
-		bottomBox.setMinWidth(ConfigVue.MARGE_LARGEUR  + ConfigVue.LARGEUR_BRANCHE + ConfigVue.MARGE_LARGEUR * 2);
-		bottomBox.setMinHeight(ConfigVue.BOTTOM_HAUTEUR);
-		bottomBox.getChildren().add(bottomPanel);
-
-
-		int hauteur2 = ConfigVue.BOTTOM_HAUTEUR;
-		int largeur2 = ConfigVue.LEFT_LARGEUR + largeur / 2;
-		canvasBottom = new Canvas(largeur2, hauteur2);
-		gcBottom = canvasBottom.getGraphicsContext2D();
-
-
-		// le bouton d'interaction avec le joueur
-		boutonJoueur = new Button();
-		boutonJoueur.setOnMouseClicked( (event) -> onBoutonJoueur(event));
-		AnchorPane.setRightAnchor(boutonJoueur, canvasBottom.getWidth() + ConfigVue.MARGE_DE ); 
-		AnchorPane.setTopAnchor(boutonJoueur, (double)ConfigVue.MARGE_HAUTEUR_BOTTOM); 
-		bottomPanel.getChildren().add(canvasBottom);
-		bottomPanel.getChildren().add(boutonJoueur);
-		// désactive et cache le bouton: seul le joueur actif aura ce bouton
-		boutonJoueur.setManaged(false); 
-		boutonJoueur.setVisible(false);
+		
 
 
 		// pour débug
@@ -434,14 +392,7 @@ public class PlateauViewCtrl implements javafx.fxml.Initializable {
 	 *        
 	 */
 	private void retaillerFenetre(final EtatPlateau etatPlateau) {
-		Scene scene = panel.getScene();
-		int nbBranches = etatPlateau.getPlateau().getNbCasesPlateau() / ConfigVue.NB_CASES_BRANCHE + 1;
-		int plateauHauteur = ConfigVue.MARGE_HAUTEUR * 2 +
-				nbBranches * ConfigVue.TAILLE_CASES * 2 +
-				ConfigVue.BOTTOM_HAUTEUR + ConfigVue.DECORATION_HAUTEUR;
-		CTRL.trace("CourseViewCtrl::retaillerFenetre plateauHueteur=" + plateauHauteur + ".");
-		scene.getWindow().setHeight(plateauHauteur);
-		scene.getWindow().setWidth(ConfigVue.PLATEAU_LARGEUR + ConfigVue.LEFT_LARGEUR);
+		
 	}
 
 
