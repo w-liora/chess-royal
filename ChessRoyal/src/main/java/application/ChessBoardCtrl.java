@@ -22,12 +22,14 @@ import models.Queen;
 import models.King;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
- * Contrôleur du plateau d'échecs .
+ * Contrôleur du plateau d'échecs JavaFX.
  *
- * Objectifs:
+ * Responsabilités :
  *  - Créer le modèle (Square[][] board) et y placer les pièces de départ.
  *  - Créer 64 SquareButton et les ajouter au GridPane.
  *  - Gérer le clic :
@@ -37,7 +39,7 @@ import java.util.ResourceBundle;
 public class ChessBoardCtrl implements Initializable {
 
     // ──────────────── constantes ────────────────
-    private static final int TAILLE = 9;          // 8×8
+    private static final int TAILLE = 8;          // 8×8
     private static final int TAILLE_CASE = 75;    // pixels par case
 
     // Répertoire des images (dans src/main/resources/images/)
@@ -61,13 +63,70 @@ public class ChessBoardCtrl implements Initializable {
     /** Coups possibles de la pièce sélectionnée */
     private Position[] coupsPossibles = new Position[0];
 
+    /**
+     * Cache des images : clé = nom du fichier (ex: "roi_blanc_sur_case_claire.png")
+     * Chargé une seule fois au démarrage dans prechargerImages().
+     */
+    private final Map<String, ImageView> cacheImages = new HashMap<>();
+
     // ──────────────── initialisation ────────────────
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initBoard();          // 1) créer le modèle
-        initBoutons();        // 2) créer les boutons JavaFX
-        rafraichirVue();      // 3) afficher les images
+        prechargerImages();   // 2) charger toutes les images en mémoire
+        initBoutons();        // 3) créer les boutons JavaFX
+        rafraichirVue();      // 4) afficher les images
+    }
+
+    /**
+     * Charge toutes les images du dossier /images/ en mémoire une seule fois.
+     * Ainsi les appels suivants à setImageBouton() sont instantanés.
+     */
+    private void prechargerImages() {
+        // Toutes les combinaisons possibles de noms d'image
+        String[] fonds    = {"claire", "sombre"};
+        String[] suffixes = {"", "_survolée"};
+
+        // Cases vides
+        for (String fond : fonds) {
+            for (String suf : suffixes) {
+                chargerEtMettrEnCache("case_" + fond + suf + ".png");
+            }
+        }
+
+        // Pièces : on liste tous les préfixes possibles
+        String[] prefixes = {
+            "roi_blanc", "roi_noir",
+            "dame_blanche", "dame_noire",
+            "tour_blanche", "tour_noire",
+            "fou_blanc", "fou_noir",
+            "cavalier_blanc", "cavalier_noir",
+            "pion_blanc", "pion_noir"
+        };
+        for (String prefixe : prefixes) {
+            for (String fond : fonds) {
+                for (String suf : suffixes) {
+                    chargerEtMettrEnCache(prefixe + "_sur_case_" + fond + suf + ".png");
+                }
+            }
+        }
+    }
+
+    /**
+     * Charge une image et la stocke dans le cache sous son nom de fichier.
+     * Si le fichier est introuvable, on ne plante pas : on ignore silencieusement.
+     */
+    private void chargerEtMettrEnCache(String nomFichier) {
+        URL url = getClass().getResource(IMG_DIR + nomFichier);
+        if (url != null) {
+            Image img = new Image(url.toString(),
+                    TAILLE_CASE, TAILLE_CASE, true, true);
+            ImageView iv = new ImageView(img);
+            iv.setFitWidth(TAILLE_CASE);
+            iv.setFitHeight(TAILLE_CASE);
+            cacheImages.put(nomFichier, iv);
+        }
     }
 
     /**
@@ -115,15 +174,17 @@ public class ChessBoardCtrl implements Initializable {
 
     /**
      * Crée les 64 boutons et les ajoute au GridPane.
-     * Chaque bouton connaît sa position (row, col) via fct lambda.
+     * Chaque bouton connaît sa position (row, col) via la lambda.
      */
     private void initBoutons() {
         for (int r = 0; r < TAILLE; r++) {
             for (int c = 0; c < TAILLE; c++) {
                 Button btn = new Button();
                 btn.setPrefSize(TAILLE_CASE, TAILLE_CASE);
+                btn.setMaxSize(TAILLE_CASE, TAILLE_CASE);
+                btn.setMinSize(TAILLE_CASE, TAILLE_CASE);
                 btn.setAlignment(Pos.CENTER);
-                // Pas d'espace entre les images
+                // Pas de padding ni d'espacement interne autour de l'image
                 btn.setStyle("-fx-padding: 0;");
 
                 // Capture des indices pour la lambda
@@ -142,8 +203,8 @@ public class ChessBoardCtrl implements Initializable {
     // ──────────────── affichage ────────────────
 
     /**
-     * Met à jour l'image de chaque bouton selon l'état du modèle
-     * Réinitialise aussi tous les surlignages (aucun coup sélectionné)
+     * Met à jour l'image de chaque bouton selon l'état du modèle.
+     * Réinitialise aussi tous les surlignages (aucun coup sélectionné).
      */
     private void rafraichirVue() {
         for (int r = 0; r < TAILLE; r++) {
@@ -172,22 +233,20 @@ public class ChessBoardCtrl implements Initializable {
     }
 
     /**
-     * Charge une image depuis /resources/images/ et la place dans le bouton.
-     * Si l'image n'existe pas, le bouton reste vide (pas d'exception).
+     * Met à jour le graphic du bouton depuis le cache — aucun accès disque.
+     * On crée un nouveau ImageView à partir de l'Image déjà en mémoire
+     * (un ImageView ne peut être utilisé qu'une fois dans le scene graph).
      */
     private void setImageBouton(Button btn, String nomImage) {
-        URL url = getClass().getResource(IMG_DIR + nomImage);
-        if (url != null) {
-            Image img = new Image(url.toString(),
-                    TAILLE_CASE, TAILLE_CASE,  // largeur, hauteur
-                    true,                       // preserve ratio
-                    true);                      // smooth
-            ImageView iv = new ImageView(img);
+        ImageView cached = cacheImages.get(nomImage);
+        if (cached != null) {
+            // Réutiliser l'Image (déjà chargée), mais créer un nouvel ImageView
+            ImageView iv = new ImageView(cached.getImage());
             iv.setFitWidth(TAILLE_CASE);
             iv.setFitHeight(TAILLE_CASE);
             btn.setGraphic(iv);
-            
-            
+            btn.setText("");
+            btn.setStyle("-fx-padding: 0; -fx-background-color: transparent; -fx-border-width: 0;");
         } else {
             // fallback : couleur unie si l'image manque
             btn.setGraphic(null);
