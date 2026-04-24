@@ -68,7 +68,7 @@ public class Pawn extends Piece {
 				
 				//On gère maintenant le "en passant" à gauche
 				Square leftSquare = board[x][y-1]; 
-				if (leftSquare != null && leftFrontSquare == null) {
+				if (leftSquare != null) {
 					Piece leftPiece = leftSquare.getPiece(); //On récupère la pièce à gauche du pion
 					//On l'ajoute si la prise est possible
 					if (this.canEnPassant(leftPiece)) {
@@ -90,7 +90,7 @@ public class Pawn extends Piece {
 				
 				//On gère maintenant le "en passant" à droite
 				Square rightSquare = board[x][y+1]; 
-				if (rightSquare != null && rightFrontSquare == null) {
+				if (rightSquare != null) {
 					Piece rightPiece = rightSquare.getPiece(); //On récupère la pièce à droite du pion
 					//On l'ajoute si la prise est possible
 					if (this.canEnPassant(rightPiece)) {
