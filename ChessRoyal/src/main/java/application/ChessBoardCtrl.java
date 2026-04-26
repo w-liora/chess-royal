@@ -1,6 +1,12 @@
 package application;
 
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
+import javafx.scene.layout.HBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.geometry.Insets;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -45,7 +51,7 @@ public class ChessBoardCtrl implements Initializable {
     // Répertoire des images (dans src/main/resources/images/)
     private static final String IMG_DIR = "/images/";
 
-    // ──────────────── composants FXML ────────────────
+    // ──────────────── composants FXML ──────────────
     @FXML private GridPane gridPlateau;
     @FXML private Label    labelStatut;
 
@@ -366,11 +372,88 @@ public class ChessBoardCtrl implements Initializable {
         Piece piece = board[fromRow][fromCol].getPiece();
         if (piece != null) {
             piece.moveTo(board, toRow, toCol);
-            labelStatut.setText(getNomComplet(piece) + " déplacé(e) en "
-                    + colonneLettre(toCol) + (TAILLE - toRow));
+        // Si c'est un pion qui vient de promouvoir → popup de choix
+        if (piece instanceof Pawn && ((Pawn) piece).isPromotion()) {
+        	rafraichirVue(); // afficher le pion arrivé avant la popup
+        	PopupPromotion(toRow, toCol, piece.getColor());
+        	}
             rafraichirVue();
         }
     }
+    
+    
+    /**
+     * Popup avec 4 boutons  (dame, tour, fou, cavalier)
+     * Bloquetant que le joueur n'a pas choisi
+     */
+    private void PopupPromotion(int row, int col, int color) {
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL); //Bloque si choix pas fait 
+        popup.initStyle(StageStyle.UNDECORATED); //Pour ne pas pouvoir fermer la fenêtre
+ 
+        String couleur  = (color == 0) ? "blanc" : "noir";
+        boolean sombre  = (row + col) % 2 == 1;
+        String  fond    = sombre ? "sombre" : "claire";
+ 
+        String[] prefixes = {
+            "dame_"     + (color == 0 ? "blanche" : "noire"),
+            "tour_"     + (color == 0 ? "blanche" : "noire"),
+            "fou_"      + couleur,
+            "cavalier_" + couleur
+        };
+
+ 
+        HBox hbox = new HBox(8); //Boite horizontal, 8 = espace entre boutons
+        hbox.setPadding(new Insets(12));
+        hbox.setStyle("-fx-background-color: #2b2b2b; -fx-border-color: #888; -fx-border-width: 2;");
+ 
+        for (int i = 0; i < 4; i++) {
+            int idx = i; //obligé de faire ça pour la fonction lambda
+            String nomImg = prefixes[i] + "_sur_case_" + fond + ".png";
+            ImageView cached = cacheImages.get(nomImg);
+ 
+            Button btn = new Button();
+            btn.setPrefSize(TAILLE_CASE, TAILLE_CASE);
+            btn.setStyle("-fx-padding: 0; -fx-background-color: transparent; -fx-cursor: hand;");
+ 
+            ImageView iv = new ImageView(cached.getImage());
+            iv.setFitWidth(TAILLE_CASE);
+            iv.setFitHeight(TAILLE_CASE);
+            btn.setGraphic(iv); //Afficher l'image dans le boutton
+            
+            btn.setOnAction(e -> { //Pour chaque bouton
+                Position pos = new Position(row, col);
+                Piece nouvellePiece = switch (idx) {
+                    case 0 -> new Queen (pos, color);//Si on est à l'étpae 0, on attribut au boutton 0 la promotion en dame
+                    case 1 -> new Rook  (pos, color); //etc.
+                    case 2 -> new Bishop(pos, color);
+                    case 3 -> new Knight(pos, color);
+                    default -> new Queen(pos, color);
+                };
+                board[row][col].setPiece(nouvellePiece);
+                
+                rafraichirVue();
+                popup.close(); 
+            });
+ 
+            hbox.getChildren().add(btn);
+        }
+ 
+        popup.setScene(new Scene(hbox));
+        popup.show();
+ 
+        // Positionner la popup près de la case de promotion
+        Stage parent = (Stage) gridPlateau.getScene().getWindow(); //On récupère le gridpane du fxml
+        double baseX = parent.getX() + gridPlateau.localToScene(0, 0).getX() + col * TAILLE_CASE; //On récupère la position de la case de promotion
+        double baseY = parent.getY() + gridPlateau.localToScene(0, 0).getY() + row * TAILLE_CASE;
+        // Si Blanc, promeut en row 0 en haut → popup en dessous ; Si Noir promeut en row 7 en bas → popup au-dessus
+        double offsetY = (color == 0) ? TAILLE_CASE + 4 : -(TAILLE_CASE + 16);
+        popup.setX(baseX);
+        popup.setY(baseY + offsetY);
+    }
+    
+    
+    
 
     /** Réinitialise la sélection et rafraîchit l'affichage. */
     private void deselectionner() {
@@ -403,10 +486,7 @@ public class ChessBoardCtrl implements Initializable {
         return v == null ? 0 : v;
     }
 
-    /** Convertit un indice de colonne (0-7) en lettre échecs (a-h). */
-    private char colonneLettre(int col) {
-        return (char) ('a' + col);
-    }
+
 
     /** Renvoie le nom complet lisible de la pièce. */
     private String getNomComplet(Piece piece) {

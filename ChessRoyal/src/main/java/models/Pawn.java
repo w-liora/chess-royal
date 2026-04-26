@@ -9,12 +9,25 @@ import java.lang.Math;
 public class Pawn extends Piece {
 	private boolean canMoveTwo; //Indique si le pion peut se déplacer de deux cases
 								//(ce qui est vrai pour le premier mouvement)
+	private int PromotionRow; //Indique la rangée de promotion d'un pion (0 ou 7 selon la couleur)
+	private boolean CanPromotion = false;
 	
 	//Constructeur
 	public Pawn(Position pos, int col) {
 		super(pos,col);
 		symbol = 'p'; 
 		canMoveTwo = true;
+		if (col == 0) {
+			PromotionRow = 0;
+		}
+		else if (col ==1) {
+			PromotionRow = 7;
+		}
+	}
+	
+	
+	public boolean isPromotion() {
+		return CanPromotion;
 	}
 	
 	//Redéfinition de la méthode moveTo pour retirer la capacité de se déplacer de deux cases, et gérer le en passant
@@ -24,6 +37,7 @@ public class Pawn extends Piece {
 		if (Math.abs(this.getCol() - y) == 1 && Math.abs(this.getRow() - x) == 1 && board[x][y].getPiece() == null && board[getRow()][y]!=null && this.canEnPassant(board[getRow()][y].getPiece())) {
 			board[getRow()][y].setPiece(null);
 		}
+		CanPromotion = (x == PromotionRow); //Si le pion est sur la rangée de promotion, on change la valeur du booléen
 		super.moveTo(board, x, y);
 	}
 
