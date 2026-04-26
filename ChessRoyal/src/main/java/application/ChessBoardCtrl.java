@@ -27,10 +27,21 @@ import models.Bishop;
 import models.Queen;
 import models.King;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+
+import javafx.application.Platform;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
+import messages.CoupEchecs;
+import messages.Message;
+import messages.ProtocoleMessageType;
+import reseau.Client;
 
 /**
  * Contrôleur du plateau d'échecs JavaFX.
@@ -75,6 +86,23 @@ public class ChessBoardCtrl implements Initializable {
      */
     private final Map<String, ImageView> cacheImages = new HashMap<>();
 
+    // ──────────────── réseau ────────────────
+
+    /**
+     * Connexion TCP vers le serveur. Null en mode local (sans réseau).
+     * Injectée depuis ConnexionCtrl via {@link #initReseau(Client, int)}.
+     */
+    private Client connexion = null;
+
+    /**
+     * Numéro de couleur du joueur local : 0 = blanc, 1 = noir.
+     * Seul le joueur dont c'est la couleur peut déplacer ses pièces.
+     */
+    private int couleurLocale = 0;
+
+    /** Service JavaFX pour écouter les messages entrants en arrière-plan. */
+    private Service<Message> serviceReception;
+
     // ──────────────── initialisation ────────────────
 
     @Override
@@ -85,10 +113,97 @@ public class ChessBoardCtrl implements Initializable {
         rafraichirVue();      // 4) afficher les images
     }
 
+    // ──────────────── réseau : initialisation ────────────────
+
     /**
-     * Charge toutes les images du dossier /images/ en mémoire une seule fois.
-     * Ainsi les appels suivants à setImageBouton() sont instantanés.
+     * Injecte la connexion réseau et la couleur du joueur local,
+     * puis démarre l'écoute des messages entrants.
+     * À appeler depuis ConnexionCtrl juste après le chargement du FXML,
+     * avant que l'utilisateur puisse interagir avec le plateau.
+     *
+     * @param connexion     client TCP connecté au serveur.
+     * @param monNumero     numéro attribué par le serveur (0 = blanc, 1 = noir).
      */
+    public void initReseau(Client connexion, int monNumero) {
+        this.connexion    = connexion;
+        this.couleurLocale = monNumero; // 0 = blanc, 1 = noir
+        labelStatut.setText(
+            "Vous jouez les " + (couleurLocale == 0 ? "Blancs" : "Noirs")
+            + " — " + (couleurLocale == 0 ? "À vous de jouer !" : "Attendez les Blancs…"));
+        demarrerServiceReception();
+    }
+
+    /**
+     * Démarre (ou relance) le service JavaFX chargé de lire les messages réseau
+     * en arrière-plan et de les appliquer sur le plateau en fil JavaFX.
+     */
+    private void demarrerServiceReception() {
+        serviceReception = new Service<Message>() {
+            @Override
+            protected Task<Message> createTask() {
+                return new Task<Message>() {
+                    @Override
+                    protected Message call() throws Exception {
+                        // Appel bloquant — s'exécute hors du fil JavaFX.
+                        return connexion.lireMessage();
+                    }
+                };
+            }
+        };
+
+        EventHandler<WorkerStateEvent> onSucceed = event -> {
+            Message msg = serviceReception.getValue();
+            if (msg != null && msg.getProtocoleMessage() == ProtocoleMessageType.COUP_ECHECS) {
+                CoupEchecs coup = (CoupEchecs) msg.getData();
+                appliquerCoupAdverse(coup);
+            }
+            // Relancer pour écouter le prochain message.
+            serviceReception.restart();
+        };
+
+        EventHandler<WorkerStateEvent> onFailed = event -> {
+            labelStatut.setText("Connexion perdue avec le serveur.");
+        };
+
+        serviceReception.setOnSucceeded(onSucceed);
+        serviceReception.setOnFailed(onFailed);
+        serviceReception.start();
+    }
+
+    /**
+     * Applique sur le plateau local un coup envoyé par l'adversaire.
+     * Appelé depuis le fil JavaFX via le service de réception.
+     *
+     * @param coup le coup à appliquer.
+     */
+    private void appliquerCoupAdverse(CoupEchecs coup) {
+        Piece piece = board[coup.getFromRow()][coup.getFromCol()].getPiece();
+        if (piece == null) return;
+
+        piece.moveTo(board, coup.getToRow(), coup.getToCol());
+
+        // Promotion éventuelle demandée par l'adversaire.
+        if (coup.isPromotion()) {
+            Position pos = new Position(coup.getToRow(), coup.getToCol());
+            Piece promue = switch (coup.getPromotionSymbol()) {
+                case 'Q' -> new Queen (pos, piece.getColor());
+                case 'R' -> new Rook  (pos, piece.getColor());
+                case 'B' -> new Bishop(pos, piece.getColor());
+                case 'N' -> new Knight(pos, piece.getColor());
+                default  -> new Queen (pos, piece.getColor());
+            };
+            board[coup.getToRow()][coup.getToCol()].setPiece(promue);
+        }
+
+        // Mettre à jour le tour : après un coup adverse, c'est notre tour.
+        rafraichirVue();
+        boolean monTour = (board[coup.getToRow()][coup.getToCol()].getPiece() != null
+                           && board[coup.getToRow()][coup.getToCol()].getPiece().getColor() != couleurLocale);
+        // Le joueur local peut maintenant jouer.
+        labelStatut.setText("À vous de jouer !");
+    }
+
+
     private void prechargerImages() {
         // Toutes les combinaisons possibles de noms d'image
         String[] fonds    = {"claire", "sombre"};
@@ -338,8 +453,15 @@ public class ChessBoardCtrl implements Initializable {
 
         // ── Cas 2 : on a une pièce sélectionnée et on clique sur un coup valide ──
         if (selectedRow != -1 && estParmisCoups(row, col)) {
-            deplacerPiece(selectedRow, selectedCol, row, col);
+            int fromRow = selectedRow;
+            int fromCol = selectedCol;
+            deplacerPiece(fromRow, fromCol, row, col);
+            // Après le déplacement (et l'éventuelle promotion), on envoie le coup résultant.
+            envoyerCoupReseau(fromRow, fromCol, row, col);
             deselectionner();
+            if (connexion != null) {
+                labelStatut.setText("Coup envoyé — en attente de l'adversaire…");
+            }
             return;
         }
 
@@ -352,6 +474,11 @@ public class ChessBoardCtrl implements Initializable {
         // ── Cas 1 & 4 : sélectionner la pièce sur la case cliquée ──
         Piece piece = board[row][col].getPiece();
         if (piece != null) {
+            // En mode réseau : bloquer les pièces de l'adversaire.
+            if (connexion != null && piece.getColor() != couleurLocale) {
+                labelStatut.setText("Ce ne sont pas vos pièces !");
+                return;
+            }
             selectedRow = row;
             selectedCol = col;
             coupsPossibles = piece.getPossibleMoves(board);
@@ -363,6 +490,35 @@ public class ChessBoardCtrl implements Initializable {
             deselectionner();
         }
     }
+
+    /**
+     * Envoie le coup joué au serveur (qui le relayera à l'adversaire).
+     * En mode local (sans réseau), ne fait rien.
+     *
+     * La promotion éventuelle est lue directement depuis le board après
+     * que {@link #deplacerPiece} l'a déjà appliquée.
+     */
+    private void envoyerCoupReseau(int fromRow, int fromCol, int toRow, int toCol) {
+        if (connexion == null) return;
+        try {
+            Piece arrivee = board[toRow][toCol].getPiece();
+            char promo = '\0';
+            if (arrivee != null && !(arrivee instanceof Pawn)) {
+                // Si ce n'est plus un pion sur la case d'arrivée, il y a eu promotion.
+                // On récupère le symbole de la pièce promue.
+                promo = arrivee.symbol;
+                // Mais on n'envoie promotion que si le coup venait réellement d'un pion.
+                // On vérfie via la rangée : pion blanc promeut en row 0, noir en row 7.
+                boolean promoblanc = (couleurLocale == 0 && toRow == 0);
+                boolean promonoir  = (couleurLocale == 1 && toRow == 7);
+                if (!promoblanc && !promonoir) promo = '\0';
+            }
+            connexion.envoyerCoup(new CoupEchecs(fromRow, fromCol, toRow, toCol, promo));
+        } catch (IOException e) {
+            labelStatut.setText("Erreur réseau lors de l'envoi du coup.");
+        }
+    }
+
 
     /**
      * Déplace la pièce de (fromRow, fromCol) vers (toRow, toCol)

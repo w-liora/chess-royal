@@ -340,20 +340,21 @@ public class ConnexionCtrl implements javafx.fxml.Initializable {
 	 */
 	private void changerVue() {
 		// chargement de la seconde vue.
-		Parent root;
 		try {
-			root = FXMLLoader.load(getClass().getResource("/fxml/PlateauView.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PlateauView.fxml"));
+			Parent root = loader.load();
+
+			// Injecter la connexion réseau et le numéro du joueur dans le contrôleur du plateau.
+			ChessBoardCtrl chessBoardCtrl = loader.getController();
+			if (chessBoardCtrl != null) {
+				chessBoardCtrl.initReseau(dataCtrl.getConnexion(), dataCtrl.getMonNumero());
+			}
 
 			// on retrouve la référence sur la scène grâce à n'importe quel widget du contrôleur.
 			Scene scene = boutonCommencer.getScene();
 			// on change le contenu de la scène: la nouvelle vue et son contrôleur prennent le relais.
 			scene.setRoot(root);
 			// on retaille la fenêtre pour qu'elle s'adapte à la nouvelle vue.
-			// NB: cet appel suppose qu'à la fin de initialize() du contrôleur de
-			// la nouvelle vue, le contenu de fenêtre principal est déjà à la bonne
-			// taille. Ce qui n'est pas le cas pour cette application (qui retaillera
-			// la fenêtre une fois ce contenu connu), mais cet appel est généralement
-			// pertinent.
 			scene.getWindow().sizeToScene();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

@@ -148,22 +148,18 @@ public class Client implements AutoCloseable {
 	 *       toutes les exceptions pouvant se produire durant
 	 *       l'émission du message.		
 	 */
-	public void envoyerLancerDes() throws IOException {
-		COMM.trace("Client::envoyerLancerDes()");
-		Message message = new Message(null, ProtocoleMessageType.DEMANDE_LANCEMENT_DES);
-		envoyerMessage(message);
-	}
 	
 	/**
-	 * Envoi du message protocolaire du type {@link ProtocoleMessageType#DEMANDE_DEPLACEMENT_PION}.
-	 * @throws IOException
-	 *       toutes les exceptions pouvant se produire durant
-	 *       l'émission du message.		
+	 * Envoi du message protocolaire du type {@link ProtocoleMessageType#COUP_ECHECS}.
+	 * @param coup le coup joué par le client.
+	 * @throws IOException toutes les exceptions pouvant se produire durant l'émission du message.
 	 */
-	public void envoyerDeplacementPion() throws IOException {
-		COMM.trace("Client::envoyerDeplacementPion()");
-		Message message = new Message(null, ProtocoleMessageType.DEMANDE_DEPLACEMENT_PION);
+	public void envoyerCoup(final messages.CoupEchecs coup) throws IOException {
+		COMM.trace("Client::envoyerCoup(" + coup + ")");
+		Message message = new Message(coup, ProtocoleMessageType.COUP_ECHECS);
 		envoyerMessage(message);
 	}
+
+
 
 }

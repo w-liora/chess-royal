@@ -21,20 +21,12 @@ public enum ProtocoleMessageType implements Serializable {
 	DEBUT_PARTIE, // transporte null (client -> serveur pour signaler qu'un joueur déclenche le début de la partie)
 	NUMERO_COUREUR, // transporte NumeroCoureur (serveur -> client pour signaler que la partie commence et lui donner son numéro)
 	
-	// phase de jeu
-	NOUVEAU_TOUR, // transporte EtatPlateau (serveur -> client pour signaler qu'un nouveau tour commence)
-	DEMANDE_LANCEMENT_DES, // transporte null (client -> serveur pour signaler que les dés doivent être tirés)
-	NOTIFICATION_VALEUR_DES, // transporte EtatPlateau (serveur -> client pour envoyer la valeur des dés)
-	DEMANDE_DEPLACEMENT_PION, // transporte null (client -> serveur pour signaler que le pion doit être envoyer)
-	NOTIFICATION_DEPLACEMENT_PION, // transporte EtatPlateau (serveur -> client pour envoyer le changement du plateau après avancement du pion)
-	
-	// phase de fin de parie
-	NOTIFICATION_FIN, // transporte EtatPlateau (serveur -> client pour transporter le nouvel état du plateau en fin de partie )
-	
 	
 	// message généré par la classe Serveur lors de la détection d'une déconnexion.
 	DECONNEXION, // transporte null
 	
+	
+	COUP_ECHECS,  //transporte un coup d'echecs
 	;
 }
 
