@@ -102,6 +102,8 @@ public class ChessBoardCtrl implements Initializable {
 
     /** Service JavaFX pour écouter les messages entrants en arrière-plan. */
     private Service<Message> serviceReception;
+    
+    private boolean monTour = true;
 
     // ──────────────── initialisation ────────────────
 
@@ -197,7 +199,7 @@ public class ChessBoardCtrl implements Initializable {
 
         // Mettre à jour le tour : après un coup adverse, c'est notre tour.
         rafraichirVue();
-        boolean monTour = (board[coup.getToRow()][coup.getToCol()].getPiece() != null
+        monTour = (board[coup.getToRow()][coup.getToCol()].getPiece() != null
                            && board[coup.getToRow()][coup.getToCol()].getPiece().getColor() != couleurLocale);
         // Le joueur local peut maintenant jouer.
         labelStatut.setText("À vous de jouer !");
@@ -450,42 +452,46 @@ public class ChessBoardCtrl implements Initializable {
      * Cas 4 : clic sur une autre pièce → changer la sélection.
      */
     private void onCaseCliquee(int row, int col) {
-
-        // ── Cas 2 : on a une pièce sélectionnée et on clique sur un coup valide ──
-        if (selectedRow != -1 && estParmisCoups(row, col)) {
-            int fromRow = selectedRow;
-            int fromCol = selectedCol;
-            deplacerPiece(fromRow, fromCol, row, col);
-            // Après le déplacement (et l'éventuelle promotion), on envoie le coup résultant.
-            envoyerCoupReseau(fromRow, fromCol, row, col);
-            deselectionner();
-            if (connexion != null) {
-                labelStatut.setText("Coup envoyé — en attente de l'adversaire…");
-            }
-            return;
-        }
-
-        // ── Cas 3 : clic sur la case déjà sélectionnée ──
-        if (row == selectedRow && col == selectedCol) {
-            deselectionner();
-            return;
-        }
-
-        // ── Cas 1 & 4 : sélectionner la pièce sur la case cliquée ──
-        Piece piece = board[row][col].getPiece();
-        if (piece != null) {
-            // En mode réseau : bloquer les pièces de l'adversaire.
-            if (connexion != null && piece.getColor() != couleurLocale) {
-                labelStatut.setText("Ce ne sont pas vos pièces !");
-                return;
-            }
-            selectedRow = row;
-            selectedCol = col;
-            coupsPossibles = piece.getPossibleMoves(board);
-            labelStatut.setText(getNomComplet(piece) + " sélectionné(e) — "
-                    + coupsPossibles.length + " coup(s) possible(s)");
-            rafraichirVueAvecSelection();
-        } else {
+        
+    	if (monTour) {
+	    	// ── Cas 2 : on a une pièce sélectionnée et on clique sur un coup valide ──
+	        if (selectedRow != -1 && estParmisCoups(row, col)) {
+	            int fromRow = selectedRow;
+	            int fromCol = selectedCol;
+	            deplacerPiece(fromRow, fromCol, row, col);
+	            // Après le déplacement (et l'éventuelle promotion), on envoie le coup résultant.
+	            envoyerCoupReseau(fromRow, fromCol, row, col);
+	            monTour = false;
+	            deselectionner();
+	            if (connexion != null) {
+	                labelStatut.setText("Coup envoyé — en attente de l'adversaire…");
+	            }
+	            return;
+	        }
+	
+	        // ── Cas 3 : clic sur la case déjà sélectionnée ──
+	        if (row == selectedRow && col == selectedCol) {
+	            deselectionner();
+	            return;
+	        }
+	
+	        // ── Cas 1 & 4 : sélectionner la pièce sur la case cliquée ──
+	        Piece piece = board[row][col].getPiece();
+	        if (piece != null) {
+	            // En mode réseau : bloquer les pièces de l'adversaire.
+	            if (connexion != null && piece.getColor() != couleurLocale) {
+	                labelStatut.setText("Ce ne sont pas vos pièces !");
+	                return;
+	            }
+	            selectedRow = row;
+	            selectedCol = col;
+	            coupsPossibles = piece.getPossibleMoves(board);
+	            labelStatut.setText(getNomComplet(piece) + " sélectionné(e) — "
+	                    + coupsPossibles.length + " coup(s) possible(s)");
+	            rafraichirVueAvecSelection();
+	        } 
+    	}
+	      else {
             // Clic sur une case vide sans sélection → rien
             deselectionner();
         }
