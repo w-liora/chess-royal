@@ -645,7 +645,7 @@ public class ChessBoardCtrl implements Initializable {
         }
  
         popup.setScene(new Scene(hbox));
-        popup.show();
+        popup.showAndWait();
  
         // Positionner la popup près de la case de promotion
         Stage parent = (Stage) gridPlateau.getScene().getWindow(); //On récupère le gridpane du fxml
