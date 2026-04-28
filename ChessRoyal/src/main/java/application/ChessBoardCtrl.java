@@ -109,10 +109,8 @@ public class ChessBoardCtrl implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        initBoard();          // 1) créer le modèle
-        prechargerImages();   // 2) charger toutes les images en mémoire
-        initBoutons();        // 3) créer les boutons JavaFX
-        rafraichirVue();      // 4) afficher les images
+        initBoard();          // créer le modèle
+        prechargerImages();   // charger toutes les images en mémoire
     }
 
     // ──────────────── réseau : initialisation ────────────────
@@ -129,6 +127,8 @@ public class ChessBoardCtrl implements Initializable {
     public void initReseau(Client connexion, int monNumero) {
         this.connexion    = connexion;
         this.couleurLocale = monNumero; // 0 = blanc, 1 = noir
+        initBoutons();        // créer les boutons JavaFX
+        rafraichirVue();      // afficher les images
         labelStatut.setText(
             "Vous jouez les " + (couleurLocale == 0 ? "Blancs" : "Noirs")
             + " — " + (couleurLocale == 0 ? "À vous de jouer !" : "Attendez les Blancs…"));
@@ -300,26 +300,47 @@ public class ChessBoardCtrl implements Initializable {
      * Chaque bouton connaît sa position (row, col) via la lambda.
      */
     private void initBoutons() {
-        for (int r = 0; r < TAILLE; r++) {
-            for (int c = 0; c < TAILLE; c++) {
-                Button btn = new Button();
-                btn.setPrefSize(TAILLE_CASE, TAILLE_CASE);
-                btn.setMaxSize(TAILLE_CASE, TAILLE_CASE);
-                btn.setMinSize(TAILLE_CASE, TAILLE_CASE);
-                btn.setAlignment(Pos.CENTER);
-                // Pas de padding ni d'espacement interne autour de l'image
-                btn.setStyle("-fx-padding: 0;");
-
-                // Capture des indices pour la lambda
-                final int row = r;
-                final int col = c;
-                btn.setOnAction(e -> onCaseCliquee(row, col));
-
-                boutons[r][c] = btn;
-                GridPane.setRowIndex(btn, r);
-                GridPane.setColumnIndex(btn, c);
-                gridPlateau.getChildren().add(btn);
-            }
+        if (couleurLocale == 0) {
+	        for (int r = 0; r < TAILLE; r++) {
+	            for (int c = 0; c < TAILLE; c++) {
+	                Button btn = new Button();
+	                btn.setPrefSize(TAILLE_CASE, TAILLE_CASE);
+	                btn.setAlignment(Pos.CENTER);
+	                // Pas de padding ni d'espacement interne autour de l'image
+	                btn.setStyle("-fx-padding: 0;");
+	
+	                // Capture des indices pour la lambda
+	                final int row = r;
+	                final int col = c;
+	                btn.setOnAction(e -> onCaseCliquee(row, col));
+	
+	                boutons[r][c] = btn;
+	                GridPane.setRowIndex(btn, r);
+	                GridPane.setColumnIndex(btn, c);
+	                gridPlateau.getChildren().add(btn);
+	            }
+	        }
+        }
+        else{
+	        for (int r = 0; r < TAILLE; r++) {
+	            for (int c = 0; c < TAILLE; c++) {
+	                Button btn = new Button();
+	                btn.setPrefSize(TAILLE_CASE, TAILLE_CASE);
+	                btn.setAlignment(Pos.CENTER);
+	                // Pas de padding ni d'espacement interne autour de l'image
+	                btn.setStyle("-fx-padding: 0;");
+	
+	                // Capture des indices pour la lambda
+	                final int row = TAILLE - 1 - r;
+	                final int col = TAILLE - 1 - c;
+	                btn.setOnAction(e -> onCaseCliquee(row,col));
+	
+	                boutons[r][c] = btn;
+	                GridPane.setRowIndex(btn, r);
+	                GridPane.setColumnIndex(btn, c);
+	                gridPlateau.getChildren().add(btn);
+	            }
+	        }
         }
     }
 
@@ -330,12 +351,22 @@ public class ChessBoardCtrl implements Initializable {
      * Réinitialise aussi tous les surlignages (aucun coup sélectionné).
      */
     private void rafraichirVue() {
-        for (int r = 0; r < TAILLE; r++) {
-            for (int c = 0; c < TAILLE; c++) {
-                String nomImage = getNomImage(r, c, false, false);
-                setImageBouton(boutons[r][c], nomImage);
+    	if (couleurLocale == 0) {
+    		for (int r = 0; r < TAILLE; r++) {
+                for (int c = 0; c < TAILLE; c++) {
+                    String nomImage = getNomImage(r, c, false, false);
+                    setImageBouton(boutons[r][c], nomImage);
+                }
             }
-        }
+    	}
+    	else {
+    		for (int r = 0; r < TAILLE; r++) {
+    			for (int c = 0; c < TAILLE; c++) {
+                    String nomImage = getNomImage(r, c, false, false);
+                    setImageBouton(boutons[TAILLE - 1 - r][TAILLE - 1 - c], nomImage);
+                }
+            }
+    	}
     }
 
     /**
@@ -345,13 +376,25 @@ public class ChessBoardCtrl implements Initializable {
      *  - reste → image normale
      */
     private void rafraichirVueAvecSelection() {
-        for (int r = 0; r < TAILLE; r++) {
-            for (int c = 0; c < TAILLE; c++) {
-                boolean estSelectionnee = (r == selectedRow && c == selectedCol);
-                boolean estDisponible   = estParmisCoups(r, c);
-                String nomImage = getNomImage(r, c, estSelectionnee, estDisponible);
-                setImageBouton(boutons[r][c], nomImage);
-            }
+        if (couleurLocale == 0 ) {
+	    	for (int r = 0; r < TAILLE; r++) {
+	            for (int c = 0; c < TAILLE; c++) {
+	                boolean estSelectionnee = (r == selectedRow && c == selectedCol);
+	                boolean estDisponible   = estParmisCoups(r, c);
+	                String nomImage = getNomImage(r, c, estSelectionnee, estDisponible);
+	                setImageBouton(boutons[r][c], nomImage);
+	            }
+	        }
+        }
+        else {
+        	for (int r = 0; r < TAILLE; r++) {
+	            for (int c = 0; c < TAILLE; c++) {
+	                boolean estSelectionnee = (r == selectedRow && c == selectedCol);
+	                boolean estDisponible   = estParmisCoups(r, c);
+	                String nomImage = getNomImage(r, c, estSelectionnee, estDisponible);
+	                setImageBouton(boutons[TAILLE - 1 - r][TAILLE - 1 - c], nomImage);
+	            }
+        	}
         }
     }
 
