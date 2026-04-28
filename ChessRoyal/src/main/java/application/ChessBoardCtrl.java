@@ -199,10 +199,17 @@ public class ChessBoardCtrl implements Initializable {
 
         // Mettre à jour le tour : après un coup adverse, c'est notre tour.
         rafraichirVue();
-        monTour = (board[coup.getToRow()][coup.getToCol()].getPiece() != null
-                           && board[coup.getToRow()][coup.getToCol()].getPiece().getColor() != couleurLocale);
-        // Le joueur local peut maintenant jouer.
-        labelStatut.setText("À vous de jouer !");
+        
+        if (trouverRoi(couleurLocale) == null) {
+        	rafraichirVue();
+        	terminerpartie(1 - couleurLocale);
+        }
+        else {
+	        monTour = (board[coup.getToRow()][coup.getToCol()].getPiece() != null
+	                           && board[coup.getToRow()][coup.getToCol()].getPiece().getColor() != couleurLocale);
+	        // Le joueur local peut maintenant jouer.
+	        labelStatut.setText("À vous de jouer !");
+        }
     }
 
 
@@ -578,6 +585,10 @@ public class ChessBoardCtrl implements Initializable {
         if (piece != null) {
             piece.moveTo(board, toRow, toCol);
         // Si c'est un pion qui vient de promouvoir → popup de choix
+        if (trouverRoi(1 - couleurLocale) == null) {
+        	rafraichirVue();
+        	terminerpartie(couleurLocale);
+        }
         if (piece instanceof Pawn && ((Pawn) piece).isPromotion()) {
         	rafraichirVue(); // afficher le pion arrivé avant la popup
         	PopupPromotion(toRow, toCol, piece.getColor());
@@ -670,7 +681,22 @@ public class ChessBoardCtrl implements Initializable {
     }
 
     // ──────────────── utilitaires ────────────────
-
+    private void terminerpartie(int gagnant) {
+    	monTour = false;
+    }
+    
+    private Piece trouverRoi(int color) {
+        for (int r = 0; r < TAILLE; r++) {
+            for (int c = 0; c < TAILLE; c++) {
+                Piece p = board[r][c].getPiece();
+                if (p != null && p.symbol == 'K' && p.getColor() == color) {
+                    return p;
+                }
+            }
+        }
+        return null; // roi introuvable
+    }
+    
     /** Vérifie si la position (row, col) fait partie des coups possibles. */
     private boolean estParmisCoups(int row, int col) {
         for (Position p : coupsPossibles) {
