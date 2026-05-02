@@ -129,9 +129,6 @@ public class ChessBoardCtrl implements Initializable {
         this.couleurLocale = monNumero; // 0 = blanc, 1 = noir
         initBoutons();        // créer les boutons JavaFX
         rafraichirVue();      // afficher les images
-        labelStatut.setText(
-            "Vous jouez les " + (couleurLocale == 0 ? "Blancs" : "Noirs")
-            + " — " + (couleurLocale == 0 ? "À vous de jouer !" : "Attendez les Blancs…"));
         demarrerServiceReception();
     }
 
@@ -207,8 +204,7 @@ public class ChessBoardCtrl implements Initializable {
         else {
 	        monTour = (board[coup.getToRow()][coup.getToCol()].getPiece() != null
 	                           && board[coup.getToRow()][coup.getToCol()].getPiece().getColor() != couleurLocale);
-	        // Le joueur local peut maintenant jouer.
-	        labelStatut.setText("À vous de jouer !");
+	        
         }
     }
 
@@ -683,6 +679,10 @@ public class ChessBoardCtrl implements Initializable {
     // ──────────────── utilitaires ────────────────
     private void terminerpartie(int gagnant) {
     	monTour = false;
+    	Stage popup =  new Stage();
+    	HBox hbox = new HBox();
+    	popup.setScene(new Scene(hbox));
+    	popup.show();
     }
     
     private Piece trouverRoi(int color) {
