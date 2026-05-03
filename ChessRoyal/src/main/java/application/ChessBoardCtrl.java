@@ -127,6 +127,7 @@ public class ChessBoardCtrl implements Initializable {
     public void initReseau(Client connexion, int monNumero) {
         this.connexion    = connexion;
         this.couleurLocale = monNumero; // 0 = blanc, 1 = noir
+        this.monTour = (monNumero == 0); // seuls les blancs peuvent jouer en premier
         initBoutons();        // créer les boutons JavaFX
         rafraichirVue();      // afficher les images
         demarrerServiceReception();
