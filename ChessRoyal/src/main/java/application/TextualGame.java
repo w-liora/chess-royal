@@ -93,7 +93,7 @@ public class TextualGame {
 	public static void main(String args[]) {
 		//Le plateau de départ
 		Square[][] board = {{new Square(new Rook(new Position(0,0),1)), new Square(new Knight(new Position(0,1),1)), new Square(new Bishop(new Position(0,2),1)), new Square(new Queen(new Position(0,3),1)), new Square(new King(new Position(0,4),1)), new Square(new Bishop(new Position(0,5),1)), new Square(new Knight(new Position(0,6),1)), new Square(new Rook(new Position(0,7),1))},
-				{new Square(new Pawn(new Position(1,0),1)), new Square(new PawnKamikaze(new Position(1,1),1)), new Square(new Pawn(new Position(1,2),1)), new Square(new Pawn(new Position(1,3),1)), new Square(new Pawn(new Position(1,4),1)), new Square(new Pawn(new Position(1,5),1)), new Square(new Pawn(new Position(1,6),1)), new Square(new Pawn(new Position(1,7),1))},
+				{new Square(new Pawn(new Position(1,0),1)), new Square(new Pawn(new Position(1,1),1)), new Square(new Pawn(new Position(1,2),1)), new Square(new Pawn(new Position(1,3),1)), new Square(new Pawn(new Position(1,4),1)), new Square(new Pawn(new Position(1,5),1)), new Square(new Pawn(new Position(1,6),1)), new Square(new Pawn(new Position(1,7),1))},
 				{new Square(null), new Square(null), new Square(null), new Square(null), new Square(null), new Square(null), new Square(null), new Square(null)},
 				{new Square(null), new Square(null), new Square(null), new Square(null), new Square(null), new Square(null), new Square(null), new Square(null)},
 				{new Square(null), new Square(null), new Square(null), new Square(null), new Square(null), new Square(null), new Square(null), new Square(null)},
