@@ -681,11 +681,41 @@ public class ChessBoardCtrl implements Initializable {
 
     // ──────────────── utilitaires ────────────────
     private void terminerpartie(int gagnant) {
-    	monTour = false;
-    	Stage popup =  new Stage();
-    	HBox hbox = new HBox();
-    	popup.setScene(new Scene(hbox));
-    	popup.show();
+        monTour = false;
+        
+        String nomGagnant = (gagnant == 0) ? "Blancs" : "Noirs";
+ 
+        Label labelGagnant = new Label("Les " + nomGagnant + " ont gagné ");
+        labelGagnant.setStyle(
+            "-fx-text-fill: #f0c040;" +
+            "-fx-font-size: 20px;" +
+            "-fx-font-weight: bold;"
+        );
+ 
+ 
+        Stage popup = new Stage();
+ 
+  
+ 
+        javafx.scene.layout.VBox vbox = new javafx.scene.layout.VBox(16, labelGagnant);
+        vbox.setAlignment(Pos.CENTER);
+        vbox.setPadding(new Insets(30));
+        vbox.setStyle(
+            "-fx-background-color: #2b2b2b;" +
+            "-fx-border-color: #f0c040;" +
+            "-fx-border-width: 3;" +
+            "-fx-border-radius: 10;" +
+            "-fx-background-radius: 10;"
+        );
+ 
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.setScene(new Scene(vbox));
+        popup.show();
+ 
+        Stage parent = (Stage) gridPlateau.getScene().getWindow();
+        popup.setX(parent.getX() + (parent.getWidth()  - popup.getWidth())  / 2);
+        popup.setY(parent.getY() + (parent.getHeight() - popup.getHeight()) / 2);
+
     }
     
     private Piece trouverRoi(int color) {
