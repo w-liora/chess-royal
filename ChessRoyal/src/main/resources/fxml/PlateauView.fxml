@@ -1,28 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Label?>
 
 <!--
-    PlateauView.fxml  –  plateau d'échecs 8x8
-    Le GridPane #gridPlateau est rempli dynamiquement par ChessBoardCtrl.
-    Pas de boutons statiques : tout est créé en Java.
+    PlateauView.fxml
+    - Le plateau est au centre (GridPane rempli dynamiquement en Java)
+    - Une colonne "cartes" est ajoutée à droite
+    - Pas de logique métier ici (uniquement structure visuelle)
 -->
 <BorderPane
     xmlns="http://javafx.com/javafx/21"
     xmlns:fx="http://javafx.com/fxml/1"
     fx:controller="application.ChessBoardCtrl"
+    prefWidth="980.0"
+    prefHeight="700.0"
     style="-fx-background-color: #2b2b2b;">
 
     <center>
-        <!-- Le GridPane sera rempli de 64 SquareButton par le contrôleur -->
+        <!-- Plateau d'échecs 8x8 (les 64 cases sont créées dans ChessBoardCtrl) -->
         <GridPane fx:id="gridPlateau"
                   style="-fx-padding: 20; -fx-hgap: 0; -fx-vgap: 0;" />
     </center>
 
+    <right>
+        <!-- Colonne de droite dédiée au futur système de cartes -->
+        <VBox spacing="18"
+              alignment="CENTER"
+              style="-fx-padding: 20; -fx-min-width: 260; -fx-background-color: #222;">
+            
+            <!-- Zone des cartes ennemies (affichées de dos plus tard) -->
+            <HBox fx:id="mainEnnemieBox" spacing="10" alignment="CENTER"/>
+
+            <!-- Zone centrale : pile de pioche + défausse -->
+            <HBox spacing="20" alignment="CENTER">
+                <!-- Pile (dos commun des cartes, image branchée plus tard en Java) -->
+                <Button fx:id="btnPioche"
+                        text="Pioche"
+                        prefWidth="90" prefHeight="130"
+                        style="-fx-background-color: #3a3a3a; -fx-border-color: #888; -fx-border-width: 2; -fx-text-fill: white;"/>
+                
+                <!-- Défausse (zone où les cartes seront jetées) -->
+                <Button fx:id="btnDefausse"
+                        text="Défausse"
+                        prefWidth="90" prefHeight="130"
+                        style="-fx-background-color: #3a3a3a; -fx-border-color: #888; -fx-border-width: 2; -fx-text-fill: white;"/>
+            </HBox>
+
+            <!-- Zone des cartes du joueur local (visibles plus tard) -->
+            <HBox fx:id="mainJoueurBox" spacing="10" alignment="CENTER"/>
+        </VBox>
+    </right>
+
     <bottom>
+        <!-- Barre d'état du jeu -->
         <VBox style="-fx-padding: 8 20 12 20; -fx-spacing: 4;">
             <Label fx:id="labelStatut"
                    text="Cliquez sur une pièce pour voir ses déplacements"

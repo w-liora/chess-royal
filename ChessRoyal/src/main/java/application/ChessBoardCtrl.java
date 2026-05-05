@@ -1,5 +1,9 @@
 package application;
 
+import java.util.ArrayList;
+import java.util.List;
+import javafx.scene.layout.HBox;
+
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.layout.HBox;
@@ -29,7 +33,9 @@ import models.King;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -65,6 +71,25 @@ public class ChessBoardCtrl implements Initializable {
     // ──────────────── composants FXML ──────────────
     @FXML private GridPane gridPlateau;
     @FXML private Label    labelStatut;
+
+    @FXML private HBox mainJoueurBox;   // emplacements des cartes du joueur (en bas à droite)
+    @FXML private HBox mainEnnemieBox;  // emplacements des cartes ennemies (en haut à droite)
+    @FXML private Button btnPioche;     // pile de cartes (affichage image du dos)
+    @FXML private Button btnDefausse;   // zone défausse (rectangle visuel)
+
+    // ──────────────── constantes visuelles cartes ────────────────
+    private static final int NB_SLOTS_CARTES = 3;
+    private static final int LARGEUR_CARTE = 90;
+    private static final int HAUTEUR_CARTE = 130;
+
+    /**
+     * Chemin de l'image dos de carte dans resources.
+     */
+    private static final String IMG_DOS_CARTE = "/images/Back.png";
+
+    // Références des boutons "slots" pour pouvoir les styliser facilement
+    private final List<Button> slotsMainJoueur = new ArrayList<>();
+    private final List<Button> slotsMainEnnemie = new ArrayList<>();
 
     // ──────────────── état interne ────────────────
     /** Modèle : tableau 8×8 de cases (ligne 0 = haut = rangée des noirs) */
@@ -111,6 +136,8 @@ public class ChessBoardCtrl implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         initBoard();          // créer le modèle
         prechargerImages();   // charger toutes les images en mémoire
+        initZoneCartesVisuelle();
+        rafraichirZoneCartesVisuelle();
     }
 
     // ──────────────── réseau : initialisation ────────────────
@@ -679,6 +706,152 @@ public class ChessBoardCtrl implements Initializable {
         rafraichirVue();
     }
 
+
+    // ──────────────── cartes : affichage statique (étape visuelle) ──────────────── ------------------------------------------------------------------
+
+    /**
+     * Construit les emplacements de cartes (3 en haut, 3 en bas),
+     * et prépare les boutons Pioche / Défausse en mode visuel uniquement.
+     */
+    private void initZoneCartesVisuelle() {
+        // Sécurité : si le FXML n'est pas encore connecté, on ne fait rien.
+        if (mainJoueurBox == null || mainEnnemieBox == null || btnPioche == null || btnDefausse == null) {
+            return;
+        }
+
+        mainJoueurBox.getChildren().clear();
+        mainEnnemieBox.getChildren().clear();
+        slotsMainJoueur.clear();
+        slotsMainEnnemie.clear();
+
+        // Crée 3 slots "cartes vides" pour l'ennemi (haut)
+        for (int i = 0; i < NB_SLOTS_CARTES; i++) {
+            Button slotEnnemi = creerSlotCarteVide();
+            slotEnnemi.setDisable(true); // visuel uniquement
+            slotsMainEnnemie.add(slotEnnemi);
+            mainEnnemieBox.getChildren().add(slotEnnemi);
+        }
+
+        // Crée 3 slots "cartes vides" pour le joueur (bas)
+        for (int i = 0; i < NB_SLOTS_CARTES; i++) {
+            Button slotJoueur = creerSlotCarteVide();
+            slotJoueur.setDisable(true); // pas de logique de clic à cette étape
+            slotsMainJoueur.add(slotJoueur);
+            mainJoueurBox.getChildren().add(slotJoueur);
+        }
+
+        // Taille homogène des boutons centraux
+        btnPioche.setPrefSize(LARGEUR_CARTE, HAUTEUR_CARTE);
+        btnDefausse.setPrefSize(LARGEUR_CARTE, HAUTEUR_CARTE);
+    }
+
+    /**
+     * Applique l'apparence initiale :
+     * - slots de main = rectangles vides
+     * - pile = image dos de carte (si disponible)
+     * - défausse = rectangle vide
+     */
+    private void rafraichirZoneCartesVisuelle() {
+        if (mainJoueurBox == null || mainEnnemieBox == null || btnPioche == null || btnDefausse == null) {
+            return;
+        }
+
+        // Main joueur : emplacements vides
+        for (Button b : slotsMainJoueur) {
+            appliquerStyleSlotVide(b);
+            b.setGraphic(null);
+            b.setText("");
+        }
+
+        // Main ennemie : emplacements vides
+        for (Button b : slotsMainEnnemie) {
+            appliquerStyleSlotVide(b);
+            b.setGraphic(null);
+            b.setText("");
+        }
+
+        // Pile : on essaie d'afficher l'image de dos
+        appliquerStylePile(btnPioche);
+        setImageBoutonCarte(btnPioche, IMG_DOS_CARTE);
+
+        // Défausse : rectangle vide
+        appliquerStyleDefausseVide(btnDefausse);
+        btnDefausse.setGraphic(null);
+        btnDefausse.setText("");
+    }
+
+    /**
+     * Fabrique un bouton "slot carte vide".
+     */
+    private Button creerSlotCarteVide() {
+        Button b = new Button();
+        b.setMinSize(LARGEUR_CARTE, HAUTEUR_CARTE);
+        b.setPrefSize(LARGEUR_CARTE, HAUTEUR_CARTE);
+        b.setMaxSize(LARGEUR_CARTE, HAUTEUR_CARTE);
+        appliquerStyleSlotVide(b);
+        b.setText("");
+        return b;
+    }
+
+    /**
+     * Style d'un emplacement carte vide.
+     */
+    private void appliquerStyleSlotVide(Button b) {
+        b.setStyle(
+            "-fx-background-color: #2f2f2f;" +
+            "-fx-border-color: #8a8a8a;" +
+            "-fx-border-width: 2;" +
+            "-fx-background-radius: 4;" +
+            "-fx-border-radius: 4;"
+        );
+    }
+
+    /**
+     * Style de la pile (bouton central gauche).
+     */
+    private void appliquerStylePile(Button b) {
+        b.setStyle(
+            "-fx-background-color: #3a3a3a;" +
+            "-fx-border-color: #b0b0b0;" +
+            "-fx-border-width: 2;" +
+            "-fx-background-radius: 4;" +
+            "-fx-border-radius: 4;" +
+            "-fx-padding: 0;"
+        );
+    }
+
+    /**
+     * Style de la défausse vide (bouton central droit).
+     */
+    private void appliquerStyleDefausseVide(Button b) {
+        b.setStyle(
+            "-fx-background-color: #262626;" +
+            "-fx-border-color: #707070;" +
+            "-fx-border-width: 2;" +
+            "-fx-background-radius: 4;" +
+            "-fx-border-radius: 4;"
+        );
+    }
+
+    /**
+     * Charge une image depuis resources et l'affiche dans un bouton carte.
+     * Si l'image est introuvable, on laisse juste le style (pas d'erreur bloquante).
+     */
+    private void setImageBoutonCarte(Button btn, String resourcePath) {
+        URL url = getClass().getResource(resourcePath);
+        if (url == null) {
+            return; // fallback silencieux si le fichier n'existe pas encore
+        }
+
+        Image img = new Image(url.toString(), LARGEUR_CARTE, HAUTEUR_CARTE, true, true);
+        ImageView iv = new ImageView(img);
+        iv.setFitWidth(LARGEUR_CARTE);
+        iv.setFitHeight(HAUTEUR_CARTE);
+        btn.setGraphic(iv);
+        btn.setText("");
+    }
+
+//------------------------------------------------------------------------------------------------------------------------------------------
     // ──────────────── utilitaires ────────────────
     private void terminerpartie(int gagnant) {
         monTour = false;
