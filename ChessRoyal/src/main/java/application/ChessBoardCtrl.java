@@ -257,7 +257,8 @@ public class ChessBoardCtrl implements Initializable {
             "fou_blanc", "fou_noir",
             "cavalier_blanc", "cavalier_noir",
             "pion_blanc", "pion_noir",
-            "PawnKamikaze_blanc", "PawnKamikaze_noir"
+            "PawnKamikaze_blanc", "PawnKamikaze_noir",
+            "BouncingBishop_blanc", "BouncingBishop_noir"
         };
         for (String prefixe : prefixes) {
             for (String fond : fonds) {
@@ -513,6 +514,7 @@ public class ChessBoardCtrl implements Initializable {
             case 'N' -> "cavalier_" + couleur;
             case 'p' -> "pion_"     + couleur;
             case 'T' -> "PawnKamikaze_" + couleur;
+            case 'G' -> "BouncingBishop_" + couleur;
             default  -> "pion_"     + couleur; // fallback
         };
     }
