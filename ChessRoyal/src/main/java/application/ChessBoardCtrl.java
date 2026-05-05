@@ -690,10 +690,7 @@ public class ChessBoardCtrl implements Initializable {
             "-fx-font-weight: bold;"
         );
  
- 
         Stage popup = new Stage();
- 
-  
  
         javafx.scene.layout.VBox vbox = new javafx.scene.layout.VBox(16, labelGagnant);
         vbox.setAlignment(Pos.CENTER);
