@@ -7,10 +7,10 @@ import java.lang.Math;
  */
 
 public class Pawn extends Piece {
-	private boolean canMoveTwo; //Indique si le pion peut se déplacer de deux cases
+	protected boolean canMoveTwo; //Indique si le pion peut se déplacer de deux cases
 								//(ce qui est vrai pour le premier mouvement)
-	private int PromotionRow; //Indique la rangée de promotion d'un pion (0 ou 7 selon la couleur)
-	private boolean CanPromotion = false;
+	protected int PromotionRow; //Indique la rangée de promotion d'un pion (0 ou 7 selon la couleur)
+	protected boolean CanPromotion = false;
 	
 	//Constructeur
 	public Pawn(Position pos, int col) {
@@ -42,7 +42,7 @@ public class Pawn extends Piece {
 	}
 
 	//Indique si ce pion peut effectuer une prise en passant sur la pièce p
-	private boolean canEnPassant(Piece p) {
+	protected boolean canEnPassant(Piece p) {
 		//On regarde si la pièce est un pion de couleur différente qui vient de se déplacer d'au moins 2 cases verticalement
 		return p instanceof Pawn && p.justMoved && p.getColor() != this.getColor() && Math.abs(p.getPrevRow() - p.getRow()) > 1 && p.getPrevCol() == p.getCol();
 	}
