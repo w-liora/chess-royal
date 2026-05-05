@@ -27,6 +27,7 @@ public enum ProtocoleMessageType implements Serializable {
 	
 	
 	COUP_ECHECS,  //transporte un coup d'echecs
+	ACTION_CARTE, // transporte une action carte (pioche ou défausse)
 	;
 }
 
