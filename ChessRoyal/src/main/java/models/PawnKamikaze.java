@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.lang.Math;
 
 
-
+///Pion qui explose quand il joue plus de deux tours, les pièces adjacentes explosent aussi 
 public class PawnKamikaze extends Pawn {
 	private int compteur;
 
