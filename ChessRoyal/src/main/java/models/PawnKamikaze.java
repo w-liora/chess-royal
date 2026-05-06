@@ -1,11 +1,8 @@
-
 package models;
 import java.util.ArrayList;
 import java.lang.Math;
 
-/*
- * Cette classe implémente un pion sur le plateau d'échec
- */
+
 
 public class PawnKamikaze extends Pawn {
 	private int compteur;
