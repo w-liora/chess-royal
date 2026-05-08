@@ -48,6 +48,11 @@ import messages.CoupEchecs;
 import messages.Message;
 import messages.ProtocoleMessageType;
 import reseau.Client;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Queue;
+
+
 
 /**
  * Contrôleur du plateau d'échecs JavaFX.
@@ -110,6 +115,16 @@ public class ChessBoardCtrl implements Initializable {
      * Chargé une seule fois au démarrage dans prechargerImages().
      */
     private final Map<String, ImageView> cacheImages = new HashMap<>();
+    
+    // toutes les cartes
+    private enum TypeCarte { BOUNCING_BISHOP, PAWN_KAMIKAZE };
+    
+    //creation de la pile
+    private final Queue<Carte> deck = new LinkedList<>();
+    //carte en main du joueur
+    private final Carte[] mainJoueur = new Carte[NB_SLOTS_CARTES];
+    //index du slot selectioné
+    private int slotCarteSelectionne = -1;
 
     // ──────────────── réseau ────────────────
 
@@ -376,6 +391,28 @@ public class ChessBoardCtrl implements Initializable {
 	        }
         }
     }
+    
+    private static class Carte {
+        final TypeCarte type;
+        Carte(TypeCarte t) { this.type = t; }
+
+        /** Chemin de l'image de la carte dans resources. */
+        String imagePath() {
+            return switch (type) {
+                case BOUNCING_BISHOP -> "/images/carte_BouncingBishop.png";
+                case PAWN_KAMIKAZE   -> "/images/carte_PawnKamikaze.png";
+            };
+        }
+
+        /** Nom lisible affiché dans le labelStatut. */
+        String nom() {
+            return switch (type) {
+                case BOUNCING_BISHOP -> "Bouncing Bishop";
+                case PAWN_KAMIKAZE   -> "Pion Kamikaze";
+            };
+        }
+    }
+    
 
     // ──────────────── affichage ────────────────
 
@@ -716,35 +753,39 @@ public class ChessBoardCtrl implements Initializable {
      * et prépare les boutons Pioche / Défausse en mode visuel uniquement.
      */
     private void initZoneCartesVisuelle() {
-        // Sécurité : si le FXML n'est pas encore connecté, on ne fait rien.
-        if (mainJoueurBox == null || mainEnnemieBox == null || btnPioche == null || btnDefausse == null) {
-            return;
-        }
+        if (mainJoueurBox == null || mainEnnemieBox == null
+                || btnPioche == null || btnDefausse == null) return;
 
         mainJoueurBox.getChildren().clear();
         mainEnnemieBox.getChildren().clear();
         slotsMainJoueur.clear();
         slotsMainEnnemie.clear();
 
-        // Crée 3 slots "cartes vides" pour l'ennemi (haut)
+        // Slots ennemis (visuels, désactivés)
         for (int i = 0; i < NB_SLOTS_CARTES; i++) {
-            Button slotEnnemi = creerSlotCarteVide();
-            slotEnnemi.setDisable(true); // visuel uniquement
-            slotsMainEnnemie.add(slotEnnemi);
-            mainEnnemieBox.getChildren().add(slotEnnemi);
+            Button slot = creerSlotCarteVide();
+            slot.setDisable(true);
+            slotsMainEnnemie.add(slot);
+            mainEnnemieBox.getChildren().add(slot);
         }
 
-        // Crée 3 slots "cartes vides" pour le joueur (bas)
+        // Slots joueur — chaque slot peut être cliqué pour jouer la carte
         for (int i = 0; i < NB_SLOTS_CARTES; i++) {
-            Button slotJoueur = creerSlotCarteVide();
-            slotJoueur.setDisable(true); // pas de logique de clic à cette étape
-            slotsMainJoueur.add(slotJoueur);
-            mainJoueurBox.getChildren().add(slotJoueur);
+            Button slot = creerSlotCarteVide();
+            final int idx = i;
+            slot.setOnAction(e -> onSlotCarteClique(idx));
+            slotsMainJoueur.add(slot);
+            mainJoueurBox.getChildren().add(slot);
         }
 
-        // Taille homogène des boutons centraux
         btnPioche.setPrefSize(LARGEUR_CARTE, HAUTEUR_CARTE);
         btnDefausse.setPrefSize(LARGEUR_CARTE, HAUTEUR_CARTE);
+
+        // ── Brancher la pioche ──
+        btnPioche.setOnAction(e -> piocherCarte());
+
+        // ── Construire et mélanger le deck initial ──
+        initialiserDeck();
     }
 
     /**
@@ -754,29 +795,20 @@ public class ChessBoardCtrl implements Initializable {
      * - défausse = rectangle vide
      */
     private void rafraichirZoneCartesVisuelle() {
-        if (mainJoueurBox == null || mainEnnemieBox == null || btnPioche == null || btnDefausse == null) {
-            return;
-        }
+        if (mainJoueurBox == null || mainEnnemieBox == null
+                || btnPioche == null || btnDefausse == null) return;
 
-        // Main joueur : emplacements vides
-        for (Button b : slotsMainJoueur) {
-            appliquerStyleSlotVide(b);
-            b.setGraphic(null);
-            b.setText("");
-        }
+        rafraichirSlotsJoueur();
 
-        // Main ennemie : emplacements vides
         for (Button b : slotsMainEnnemie) {
             appliquerStyleSlotVide(b);
             b.setGraphic(null);
             b.setText("");
         }
 
-        // Pile : on essaie d'afficher l'image de dos
         appliquerStylePile(btnPioche);
         setImageBoutonCarte(btnPioche, IMG_DOS_CARTE);
 
-        // Défausse : rectangle vide
         appliquerStyleDefausseVide(btnDefausse);
         btnDefausse.setGraphic(null);
         btnDefausse.setText("");
@@ -855,6 +887,78 @@ public class ChessBoardCtrl implements Initializable {
 
 //------------------------------------------------------------------------------------------------------------------------------------------
     // ──────────────── utilitaires ────────────────
+    private void initialiserDeck() {
+        deck.clear();
+        for (int i = 0; i < 4; i++) {
+            deck.add(new Carte(TypeCarte.BOUNCING_BISHOP));
+            deck.add(new Carte(TypeCarte.PAWN_KAMIKAZE));
+        }
+        List<Carte> liste = new ArrayList<>(deck);
+        Collections.shuffle(liste);
+        deck.clear();
+        deck.addAll(liste);
+    }
+    
+    private void piocherCarte() {
+        // Trouver un slot libre
+        int slotLibre = -1;
+        for (int i = 0; i < NB_SLOTS_CARTES; i++) {
+            if (mainJoueur[i] == null) { slotLibre = i; break; }
+        }
+        if (slotLibre == -1) {
+            labelStatut.setText("Main pleine — jouez une carte d'abord !");
+            return;
+        }
+        if (deck.isEmpty()) initialiserDeck();
+
+        Carte carte = deck.poll();
+        mainJoueur[slotLibre] = carte;
+        rafraichirSlotsJoueur();
+    }
+    
+    private void onSlotCarteClique(int idx) {
+        if (mainJoueur[idx] == null) return; 
+
+        if (slotCarteSelectionne == idx) {
+        } else {
+            slotCarteSelectionne = idx;
+        }
+        rafraichirSlotsJoueur();
+    }
+    
+    private void rafraichirSlotsJoueur() {
+        for (int i = 0; i < NB_SLOTS_CARTES; i++) {
+            Button btn = slotsMainJoueur.get(i);
+            if (mainJoueur[i] == null) {
+                appliquerStyleSlotVide(btn);
+                btn.setGraphic(null);
+                btn.setText("");
+            } else {
+                setImageBoutonCarte(btn, mainJoueur[i].imagePath());
+                if (i == slotCarteSelectionne) {
+                    btn.setStyle(
+                        "-fx-background-color: #3a3a3a;" +
+                        "-fx-border-color: #f0c040;" +
+                        "-fx-border-width: 3;" +
+                        "-fx-background-radius: 4;" +
+                        "-fx-border-radius: 4;" +
+                        "-fx-padding: 0;"
+                    );
+                } else {
+                    btn.setStyle(
+                        "-fx-background-color: #3a3a3a;" +
+                        "-fx-border-color: #b0b0b0;" +
+                        "-fx-border-width: 2;" +
+                        "-fx-background-radius: 4;" +
+                        "-fx-border-radius: 4;" +
+                        "-fx-padding: 0;"
+                    );
+                }
+            }
+        }
+    }
+    
+    
     private void terminerpartie(int gagnant) {
         monTour = false;
         

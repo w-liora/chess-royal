@@ -26,6 +26,9 @@ public enum ProtocoleMessageType implements Serializable {
 	DECONNEXION, // transporte null
 	
 	
+	PRENDRE_CARTE, //transporte la prise d'une carte
+	APPLIQUER_CARTE, //transporte l'application d'une carte
+	
 	COUP_ECHECS,  //transporte un coup d'echecs
 	;
 }
