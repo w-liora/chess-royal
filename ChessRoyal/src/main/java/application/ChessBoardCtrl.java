@@ -84,8 +84,8 @@ public class ChessBoardCtrl implements Initializable {
 
     // ──────────────── constantes visuelles cartes ────────────────
     private static final int NB_SLOTS_CARTES = 3;
-    private static final int LARGEUR_CARTE = 90;
-    private static final int HAUTEUR_CARTE = 130;
+    private static final int LARGEUR_CARTE =140;
+    private static final int HAUTEUR_CARTE = 190;
 
     /**
      * Chemin de l'image dos de carte dans resources.
