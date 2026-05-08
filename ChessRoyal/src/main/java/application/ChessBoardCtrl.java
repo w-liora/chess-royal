@@ -117,7 +117,7 @@ public class ChessBoardCtrl implements Initializable {
     private final Map<String, ImageView> cacheImages = new HashMap<>();
     
     // toutes les cartes
-    private enum TypeCarte { BOUNCING_BISHOP, PAWN_KAMIKAZE };
+    private enum TypeCarte { BOUNCING_BISHOP, PAWN_KAMIKAZE, EXTERMINATOR_KNIGHT };
     
     //creation de la pile
     private final Queue<Carte> deck = new LinkedList<>();
@@ -273,7 +273,8 @@ public class ChessBoardCtrl implements Initializable {
             "cavalier_blanc", "cavalier_noir",
             "pion_blanc", "pion_noir",
             "PawnKamikaze_blanc", "PawnKamikaze_noir",
-            "BouncingBishop_blanc", "BouncingBishop_noir"
+            "BouncingBishop_blanc", "BouncingBishop_noir",
+            "ExterminatorKnight_blanc", "ExterminatorKnight_noir"
         };
         for (String prefixe : prefixes) {
             for (String fond : fonds) {
@@ -400,6 +401,7 @@ public class ChessBoardCtrl implements Initializable {
         String imagePath() {
             return switch (type) {
                 case BOUNCING_BISHOP -> "/images/carte_BouncingBishop.png";
+                case EXTERMINATOR_KNIGHT -> "/images/carte_ExterminatorKnight.png";
                 case PAWN_KAMIKAZE   -> "/images/carte_PawnKamikaze.png";
             };
         }
@@ -409,6 +411,7 @@ public class ChessBoardCtrl implements Initializable {
             return switch (type) {
                 case BOUNCING_BISHOP -> "Bouncing Bishop";
                 case PAWN_KAMIKAZE   -> "Pion Kamikaze";
+                case EXTERMINATOR_KNIGHT -> "Cavalier Exterminateur";
             };
         }
     }
@@ -552,6 +555,8 @@ public class ChessBoardCtrl implements Initializable {
             case 'p' -> "pion_"     + couleur;
             case 'T' -> "PawnKamikaze_" + couleur;
             case 'G' -> "BouncingBishop_" + couleur;
+            case 'E' -> "ExterminatorKnight_" + couleur;
+            
             default  -> "pion_"     + couleur; // fallback
         };
     }
@@ -892,6 +897,7 @@ public class ChessBoardCtrl implements Initializable {
         for (int i = 0; i < 4; i++) {
             deck.add(new Carte(TypeCarte.BOUNCING_BISHOP));
             deck.add(new Carte(TypeCarte.PAWN_KAMIKAZE));
+            deck.add(new Carte(TypeCarte.EXTERMINATOR_KNIGHT));
         }
         List<Carte> liste = new ArrayList<>(deck);
         Collections.shuffle(liste);
