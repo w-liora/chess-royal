@@ -1,13 +1,13 @@
-package application;
+package main.java.application;
 
-import static common.Log.COMM;
-import static common.Log.GEN;
+import static main.java.common.Log.COMM;
+import static main.java.common.Log.GEN;
 
 import java.io.IOException;
 
 import org.apache.logging.log4j.Level;
 
-import common.Log;
+import main.java.common.Log;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
