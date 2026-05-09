@@ -1,4 +1,4 @@
-package course;
+package main.java.course;
 
 import java.io.Serializable;
 import java.util.Objects;

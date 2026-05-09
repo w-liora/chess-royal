@@ -1,6 +1,6 @@
-package reseau;
+package main.java.reseau;
 
-import static common.Log.COMM;
+import static main.java.common.Log.COMM;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

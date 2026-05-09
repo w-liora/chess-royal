@@ -1,4 +1,4 @@
-package messages;
+package main.java.messages;
 
 import java.io.Serializable;
 import java.nio.channels.SelectionKey;

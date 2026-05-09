@@ -1,7 +1,7 @@
-package course;
+package main.java.course;
 
-import static common.Log.COMM;
-import static common.Log.GEN;
+import static main.java.common.Log.COMM;
+import static main.java.common.Log.GEN;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
@@ -10,15 +10,15 @@ import java.util.List;
 
 import org.apache.logging.log4j.Level;
 
-import common.Log;
-import messages.CoupEchecs;
-import messages.ListeJoueursConnectes;
-import messages.Message;
-import messages.MessageSigne;
-import messages.NouveauJoueur;
-import messages.NumeroCoureur;
-import messages.ProtocoleMessageType;
-import reseau.Serveur;
+import main.java.common.Log;
+import main.java.messages.CoupEchecs;
+import main.java.messages.ListeJoueursConnectes;
+import main.java.messages.Message;
+import main.java.messages.MessageSigne;
+import main.java.messages.NouveauJoueur;
+import main.java.messages.NumeroCoureur;
+import main.java.messages.ProtocoleMessageType;
+import main.java.reseau.Serveur;
 
 /**
  * Serveur dédié au jeu d'échecs en réseau.

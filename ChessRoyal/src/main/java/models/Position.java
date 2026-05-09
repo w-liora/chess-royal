@@ -1,4 +1,4 @@
-package models;
+package main.java.models;
 
 /* 
  * Représente une position sur le plateau

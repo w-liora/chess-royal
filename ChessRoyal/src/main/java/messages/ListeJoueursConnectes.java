@@ -1,9 +1,9 @@
-package messages;
+package main.java.messages;
 
 import java.io.Serializable;
 import java.util.List;
 
-import course.Coureur;
+import main.java.course.Coureur;
 
 /**
  * Classe pour le transport de la liste des joueurs connectés.

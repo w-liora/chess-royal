@@ -1,8 +1,8 @@
-package tests;
+package test.java.tests;
 
-import models.Position;
-import models.Square;
-import models.Pawn;
+import main.java.models.Position;
+import main.java.models.Square;
+import main.java.models.Pawn;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;

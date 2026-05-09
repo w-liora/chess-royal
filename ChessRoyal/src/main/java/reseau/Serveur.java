@@ -1,8 +1,8 @@
-package reseau;
+package main.java.reseau;
 
 
 
-import static common.Log.COMM;
+import static main.java.common.Log.COMM;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -15,9 +15,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import messages.Message;
-import messages.MessageSigne;
-import messages.ProtocoleMessageType;
+import main.java.messages.Message;
+import main.java.messages.MessageSigne;
+import main.java.messages.ProtocoleMessageType;
 
 /**
  * Classe représentant le serveur du jeu, utilisant JavaNIO pour gérer les connexions clients de manière asynchrone

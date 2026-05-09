@@ -1,7 +1,7 @@
+package main.java.models;
 
-package models;
 import java.io.Serializable;
-import models.Square;
+import main.java.models.Square;
 
 public abstract class Card implements Serializable {
 	String nom;
