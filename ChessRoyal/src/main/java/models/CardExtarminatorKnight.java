@@ -1,4 +1,4 @@
-package main.java.models;
+package models;
 ///Cavalier qui mange toutes les pièces adverses sur son chemin 
 public class CardExtarminatorKnight extends Card {
 	

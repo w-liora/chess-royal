@@ -1,4 +1,4 @@
-package main.java.models;
+package models;
 
 /*
  * Cette classe abstraite modélise une pièce sur le plateau, par sa position, sa couleur, sa position précédente et son mouvement.

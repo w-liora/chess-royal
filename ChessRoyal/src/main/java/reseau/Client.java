@@ -1,14 +1,14 @@
-package main.java.reseau;
+package reseau;
 
-import static main.java.common.Log.COMM;
+import static common.Log.COMM;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 
-import main.java.messages.Message;
-import main.java.messages.NouveauJoueur;
-import main.java.messages.ProtocoleMessageType;
+import messages.Message;
+import messages.NouveauJoueur;
+import messages.ProtocoleMessageType;
 
 
 /**

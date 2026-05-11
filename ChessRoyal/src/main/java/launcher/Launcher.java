@@ -1,6 +1,6 @@
-package main.java.launcher;
+package launcher;
 
-import main.java.application.Main;
+import application.Main;
 
 /**
  * Classe Laucher pour cacher à la JVM utilisé dans les scripts que l'on

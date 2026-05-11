@@ -1,4 +1,4 @@
-package main.java.reseau;
+package reseau;
 
 /*
  * $Id: ReadMessageStatus.java 30 2016-06-02 13:31:57Z conan $

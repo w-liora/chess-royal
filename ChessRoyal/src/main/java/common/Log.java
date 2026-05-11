@@ -19,7 +19,7 @@ along with the CSC4509 teaching unit. If not, see <http://www.gnu.org/licenses/>
 Initial developer(s): Denis Conan
 Contributor(s):
  */
-package main.java.common;
+package common;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;

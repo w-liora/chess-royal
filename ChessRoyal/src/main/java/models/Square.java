@@ -1,4 +1,4 @@
-package main.java.models;
+package models;
 
 /*
  * Représente une case sur le plateau 

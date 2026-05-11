@@ -1,4 +1,4 @@
-package main.java.models;
+package models;
 
 /**
  * Carte qui transforme un fou allié en BouncingBishop.
