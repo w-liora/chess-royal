@@ -126,9 +126,6 @@ public class ChessBoardCtrl implements Initializable {
     //index du slot selectioné
     private int slotCarteSelectionne = -1;
 
-    //carte actuellement visible dans la défausse
-    private Carte carteDansDefausse = null;
-
     // ──────────────── réseau ────────────────
 
     /**
@@ -791,8 +788,6 @@ public class ChessBoardCtrl implements Initializable {
 
         // ── Brancher la pioche ──
         btnPioche.setOnAction(e -> piocherCarte());
-        // ── Brancher la défausse ──
-        btnDefausse.setOnAction(e -> defausserCarteSelectionnee());
 
         // ── Construire et mélanger le deck initial ──
         initialiserDeck();
@@ -819,21 +814,9 @@ public class ChessBoardCtrl implements Initializable {
         appliquerStylePile(btnPioche);
         setImageBoutonCarte(btnPioche, IMG_DOS_CARTE);
 
-       rafraichirDefausseVisuelle();
-    }
-
-    private void rafraichirDefausseVisuelle() {
-        if (btnDefausse == null) return;
-
-        if (carteDansDefausse == null) {
-            appliquerStyleDefausseVide(btnDefausse);
-            btnDefausse.setGraphic(null);
-            btnDefausse.setText("");
-        } 
-        else {
-            appliquerStylePile(btnDefausse); 
-            setImageBoutonCarte(btnDefausse, carteDansDefausse.imagePath());
-        }
+        appliquerStyleDefausseVide(btnDefausse);
+        btnDefausse.setGraphic(null);
+        btnDefausse.setText("");
     }
 
     /**
@@ -907,8 +890,6 @@ public class ChessBoardCtrl implements Initializable {
         btn.setText("");
     }
 
-
-
 //------------------------------------------------------------------------------------------------------------------------------------------
     // ──────────────── utilitaires ────────────────
     private void initialiserDeck() {
@@ -945,31 +926,11 @@ public class ChessBoardCtrl implements Initializable {
         if (mainJoueur[idx] == null) return; 
 
         if (slotCarteSelectionne == idx) {
-            slotCarteSelectionne = -1; // 2eme clic sur la meme carte -> on désélectionne
-        } 
-        else {
+        } else {
             slotCarteSelectionne = idx;
         }
         rafraichirSlotsJoueur();
     }
-
-    private void defausserCarteSelectionnee() {
-        if (slotCarteSelectionne == -1) {
-            return;
-        }
-        if (mainJoueur[slotCarteSelectionne] == null) {
-            slotCarteSelectionne = -1;
-            rafraichirSlotsJoueur();
-            return;
-        }
-        // Retirer la carte de la main et l'afficher dans la défausse
-        carteDansDefausse = mainJoueur[slotCarteSelectionne];
-        mainJoueur[slotCarteSelectionne] = null;
-        slotCarteSelectionne = -1;
-        rafraichirSlotsJoueur();
-        rafraichirDefausseVisuelle();
-    }
-
     
     private void rafraichirSlotsJoueur() {
         for (int i = 0; i < NB_SLOTS_CARTES; i++) {
@@ -983,17 +944,13 @@ public class ChessBoardCtrl implements Initializable {
                 if (i == slotCarteSelectionne) {
                     btn.setStyle(
                         "-fx-background-color: #3a3a3a;" +
-                        "-fx-border-color:rgb(255, 255, 255);" +
-                        "-fx-border-width: 5;" +
-                        "-fx-background-radius: 6;" +
-                        "-fx-border-radius: 6;" +
-                        "-fx-padding: 0;" +
-                        "-fx-effect: dropshadow(gaussian, rgb(255, 255, 255), 22, 0.7, 0, 0);"
+                        "-fx-border-color: #f0c040;" +
+                        "-fx-border-width: 3;" +
+                        "-fx-background-radius: 4;" +
+                        "-fx-border-radius: 4;" +
+                        "-fx-padding: 0;"
                     );
-                    btn.setScaleX(1.04); //On zoom un peu la carte quand c'est selectionné
-                    btn.setScaleY(1.04);
-                } 
-                else {
+                } else {
                     btn.setStyle(
                         "-fx-background-color: #3a3a3a;" +
                         "-fx-border-color: #b0b0b0;" +
@@ -1002,8 +959,6 @@ public class ChessBoardCtrl implements Initializable {
                         "-fx-border-radius: 4;" +
                         "-fx-padding: 0;"
                     );
-                    btn.setScaleX(1.0); // On dézoom
-                    btn.setScaleY(1.0);
                 }
             }
         }
