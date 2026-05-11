@@ -1,6 +1,6 @@
-package main.java.application;
+package application;
 
-import main.java.reseau.Client;
+import reseau.Client;
 
 /**
  * Classe qui contient toutes les références qui doivent être transmise d'un contrôleur à 

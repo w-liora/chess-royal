@@ -1,14 +1,14 @@
-package main.java.application;
+package application;
 
-import static main.java.common.Log.COMM;
-import static main.java.common.Log.CTRL;
+import static common.Log.COMM;
+import static common.Log.CTRL;
 
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import main.java.course.Coureur;
+import course.Coureur;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
@@ -22,10 +22,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import main.java.reseau.Client;
-import main.java.messages.ListeJoueursConnectes;
-import main.java.messages.Message;
-import main.java.messages.NumeroCoureur;
+import reseau.Client;
+import messages.ListeJoueursConnectes;
+import messages.Message;
+import messages.NumeroCoureur;
 
 
 public class ConnexionCtrl implements javafx.fxml.Initializable {

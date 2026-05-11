@@ -1,4 +1,4 @@
-package main.java.application;
+package application;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,17 +19,17 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 
-import main.java.models.Piece;
-import main.java.models.Position;
-import main.java.models.Square;
+import models.Piece;
+import models.Position;
+import models.Square;
 
 // Pièces concrètes (pour initialiser le plateau de départ)
-import main.java.models.Pawn;
-import main.java.models.Rook;
-import main.java.models.Knight;
-import main.java.models.Bishop;
-import main.java.models.Queen;
-import main.java.models.King;
+import models.Pawn;
+import models.Rook;
+import models.Knight;
+import models.Bishop;
+import models.Queen;
+import models.King;
 
 import java.io.IOException;
 import java.net.URL;
@@ -44,10 +44,10 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
-import main.java.messages.CoupEchecs;
-import main.java.messages.Message;
-import main.java.messages.ProtocoleMessageType;
-import main.java.reseau.Client;
+import messages.CoupEchecs;
+import messages.Message;
+import messages.ProtocoleMessageType;
+import reseau.Client;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;

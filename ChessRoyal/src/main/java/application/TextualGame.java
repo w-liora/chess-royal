@@ -1,7 +1,7 @@
-package main.java.application;
+package application;
 
 import java.util.Scanner;
-import main.java.models.*;
+import models.*;
 
 /**
  * Cette classe implémente une version textuelle du jeu d'échec, n'utilisant que les classes associées au pièces.
