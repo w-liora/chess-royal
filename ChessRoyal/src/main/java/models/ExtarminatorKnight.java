@@ -10,7 +10,7 @@ public class ExtarminatorKnight extends Knight {
 	}
 	
 
-
+	@Override
 	public void moveTo(Square[][] board, int x, int y) {
 
 		int oldX = pos.getRow();

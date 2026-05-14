@@ -5,6 +5,7 @@ import java.util.List;
 import javafx.scene.layout.HBox;
 
 import javafx.fxml.FXML;
+import models.LavaSquare;
 import javafx.scene.Scene;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
@@ -266,6 +267,7 @@ public class ChessBoardCtrl implements Initializable {
                 chargerEtMettrEnCache("case_" + fond + suf + ".png");
             }
         }
+        chargerEtMettrEnCache("case_lave.png");
 
         // Pièces : on liste tous les préfixes possibles
         String[] prefixes = {
@@ -531,6 +533,10 @@ public class ChessBoardCtrl implements Initializable {
         String suffixe = survole ? "_survolée" : "";
 
         Piece piece = board[row][col].getPiece();
+        
+        if (board[row][col] instanceof LavaSquare) {
+            return "case_lave.png";
+        }
 
         if (piece == null) {
             // Case vide
@@ -657,6 +663,10 @@ public class ChessBoardCtrl implements Initializable {
         Piece piece = board[fromRow][fromCol].getPiece();
         if (piece != null) {
             piece.moveTo(board, toRow, toCol);
+         // Si la case d'arrivée est une Square, le pion disparait
+            if (board[toRow][toCol] instanceof LavaSquare) {
+                board[toRow][toCol].effect();
+            }
         // Si c'est un pion qui vient de promouvoir → popup de choix
         if (trouverRoi(1 - couleurLocale) == null) {
         	rafraichirVue();

@@ -5,7 +5,7 @@ package models;
  */
 
 public class Square {
-	private Piece piece;	//La pièce présente sur cette case ; null si aucune
+	protected Piece piece;	//La pièce présente sur cette case ; null si aucune
 	
 	//Le constructeur si aucune pièce n'est spécifiée
 	public Square() {
