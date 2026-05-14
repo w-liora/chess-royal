@@ -978,20 +978,19 @@ public class ChessBoardCtrl implements Initializable {
                 appliquerStyleSlotVide(btn);
                 btn.setGraphic(null);
                 btn.setText("");
+                btn.setScaleX(1.00);
+                btn.setScaleY(1.00);
             } else {
                 setImageBoutonCarte(btn, mainJoueur[i].imagePath());
                 if (i == slotCarteSelectionne) {
                     btn.setStyle(
                         "-fx-background-color: #3a3a3a;" +
-                        "-fx-border-color:rgb(255, 255, 255);" +
-                        "-fx-border-width: 5;" +
                         "-fx-background-radius: 6;" +
                         "-fx-border-radius: 6;" +
-                        "-fx-padding: 0;" +
-                        "-fx-effect: dropshadow(gaussian, rgb(255, 255, 255), 22, 0.7, 0, 0);"
+                        "-fx-padding: 0;"
                     );
-                    btn.setScaleX(1.04); //On zoom un peu la carte quand c'est selectionné
-                    btn.setScaleY(1.04);
+                    btn.setScaleX(1.09); //On zoom un peu la carte quand c'est selectionné
+                    btn.setScaleY(1.09);
                 } 
                 else {
                     btn.setStyle(
