@@ -213,12 +213,12 @@ public class ChessBoardCtrl implements Initializable {
                 }
 
                 case PRENDRE_CARTE -> {
-                    // L'adversaire a pioché — on affiche le dos de carte côté ennemi
+                    // L'adversaire a pioché on affiche le dos de carte côté ennemi de l'autr ecoté
                     appliquerPiocheAdverse();
                 }
 
                 case APPLIQUER_CARTE -> {
-                    // L'adversaire a joué une carte — on applique l'effet sur notre board
+                    //si  L'adversaire a joué une carte  on applique l'effet sur notre board
                     CardMessage action = (CardMessage) msg.getData();
                     appliquerCarteAdverse(action);
                 }
@@ -234,12 +234,9 @@ public class ChessBoardCtrl implements Initializable {
         serviceReception.start();
     }
 
-    /**
-     * Applique sur le plateau local un coup envoyé par l'adversaire.
-     * Appelé depuis le fil JavaFX via le service de réception.
-     *
-     * @param coup le coup à appliquer.
-     */
+    // Pour Appliquerlocalement un coup envoyé par l'adversaire
+
+
     private void appliquerCoupAdverse(CoupEchecs coup) {
         if (aDejaAgi) {
             aDejaAgi = false;
@@ -430,7 +427,7 @@ public class ChessBoardCtrl implements Initializable {
             };
         }
 
-        /** Nom lisible affiché dans le labelStatut. */
+        //Pour les cartes 
         String nom() {
             return switch (type) {
                 case BOUNCING_BISHOP -> "Bouncing Bishop";
@@ -669,7 +666,7 @@ private void jouerCarte(int slotIdx, int row, int col) {
     CardMessage action = new CardMessage(carte.type.ordinal(), row, col);
     envoyerActionCarte(action, ProtocoleMessageType.APPLIQUER_CARTE);
 
-    // Retirer la carte de la main
+    // Retirer la carte de la main quand on la joue 
     mainJoueur[slotIdx] = null;
     slotCarteSelectionne = -1;
 
@@ -677,10 +674,8 @@ private void jouerCarte(int slotIdx, int row, int col) {
     rafraichirVue();
 }
 
-/**
- * Construit la Card models à partir du TypeCarte local.
- * Ajoute ici tes nouvelles cartes quand tu en crées.
- */
+//Construit la Card models
+
 private models.Card creerCardModel(TypeCarte type) {
     return switch (type) {
         case PAWN_KAMIKAZE       -> new models.CardPawnKamikaze();
@@ -727,7 +722,7 @@ private void appliquerPiocheAdverse() {
 
 
 
-
+//Permet d'envoyer l'action d'une carte
 private void envoyerActionCarte(CardMessage action, ProtocoleMessageType type) {
     if (connexion == null) return;
     try {
@@ -877,7 +872,7 @@ private void envoyerActionCarte(CardMessage action, ProtocoleMessageType type) {
     }
 
 
-    // ──────────────── cartes : affichage statique (étape visuelle) ──────────────── ------------------------------------------------------------------
+ 
 
     /**
      * Construit les emplacements de cartes (3 en haut, 3 en bas),
@@ -959,9 +954,8 @@ private void envoyerActionCarte(CardMessage action, ProtocoleMessageType type) {
         }
     }
 
-    /**
-     * Fabrique un bouton "slot carte vide".
-     */
+    //Fabrique un bouton "slot carte vide"
+
     private Button creerSlotCarteVide() {
         Button b = new Button();
         b.setMinSize(LARGEUR_CARTE, HAUTEUR_CARTE);
@@ -972,9 +966,7 @@ private void envoyerActionCarte(CardMessage action, ProtocoleMessageType type) {
         return b;
     }
 
-    /**
-     * Style d'un emplacement carte vide.
-     */
+    //Style d'un emplacement carte vide
     private void appliquerStyleSlotVide(Button b) {
         b.setStyle(
             "-fx-background-color: #2f2f2f;" +
@@ -985,9 +977,8 @@ private void envoyerActionCarte(CardMessage action, ProtocoleMessageType type) {
         );
     }
 
-    /**
-     * Style de la pile (bouton central gauche).
-     */
+    //Style de la pile 
+ 
     private void appliquerStylePile(Button b) {
         b.setStyle(
             "-fx-background-color: #3a3a3a;" +
@@ -1047,17 +1038,18 @@ private void envoyerActionCarte(CardMessage action, ProtocoleMessageType type) {
         deck.addAll(liste);
     }
     
+ //Pour piocher une carte
     private void piocherCarte() {
-        if (!monTour || aDejaAgi) return;
+        if (!monTour || aDejaAgi) return; //On peut pas si c pas notr etour ou si on a deja agi (on a joué un coup par exemple)
         
         // Trouver un slot libre D'ABORD
         int slotLibre = -1;
         for (int i = 0; i < NB_SLOTS_CARTES; i++) {
-            if (mainJoueur[i] == null) { slotLibre = i; break; }
+            if (mainJoueur[i] == null) { slotLibre = i; break; } //Pour trouver un slot ou placer la nouvelle carte
         }
         if (slotLibre == -1) {
   
-            return; // on sort sans changer aDejaAgi ni monTour
+            return; // on sort sans changer aDejaAgi ni monTour si aucun slot n'est libre on peut juste pas piocher (3 cartes max en main)
         }
         if (deck.isEmpty()) initialiserDeck();
 
@@ -1075,7 +1067,7 @@ private void envoyerActionCarte(CardMessage action, ProtocoleMessageType type) {
         if (mainJoueur[idx] == null) return; 
 
         if (slotCarteSelectionne == idx) {
-            slotCarteSelectionne = -1; // 2eme clic sur la meme carte -> on désélectionne
+            slotCarteSelectionne = -1; // 2eme clic sur la meme carte = on désélectionne
         } 
         else {
             slotCarteSelectionne = idx;
