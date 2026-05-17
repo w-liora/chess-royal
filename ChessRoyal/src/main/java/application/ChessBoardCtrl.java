@@ -313,13 +313,12 @@ public class ChessBoardCtrl implements Initializable {
     private void chargerEtMettrEnCache(String nomFichier) {
         URL url = getClass().getResource(IMG_DIR + nomFichier);
         if (url != null) {
-            Image img = new Image(url.toString(), TAILLE_CASE, TAILLE_CASE, true, true);
+            Image img = new Image(url.toString(),
+                    TAILLE_CASE, TAILLE_CASE, true, true);
             ImageView iv = new ImageView(img);
             iv.setFitWidth(TAILLE_CASE);
             iv.setFitHeight(TAILLE_CASE);
             cacheImages.put(nomFichier, iv);
-        } else {
-            System.out.println("IMAGE NON TROUVÉE: " + nomFichier);
         }
     }
 
