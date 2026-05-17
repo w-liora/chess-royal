@@ -1,8 +1,8 @@
 package models;
 ///Cavalier qui mange toutes les pièces adverses sur son chemin 
-public class CardExtarminatorKnight extends Card {
+public class CardExterminatorKnight extends Card {
 	
-	public CardExtarminatorKnight() {
+	public CardExterminatorKnight() {
 		super("ExtarminatorKnight");
 	}
 
@@ -18,7 +18,7 @@ public class CardExtarminatorKnight extends Card {
 	    Position pos = new Position(row, col);
 
 	    // Remplacer le Knight par un ExtarminatorKnight au même endroit
-	    ExtarminatorKnight extarminator = new ExtarminatorKnight(pos, piece.getColor());
+	    ExterminatorKnight extarminator = new ExterminatorKnight(pos, piece.getColor());
 	    board[row][col].setPiece(extarminator);
 	}
 }

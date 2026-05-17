@@ -2,9 +2,9 @@ package models;
 import java.util.ArrayList;
 import java.lang.Math;
 
-public class ExtarminatorKnight extends Knight {
+public class ExterminatorKnight extends Knight {
 	//Constructeur
-	public ExtarminatorKnight(Position pos, int col) {
+	public ExterminatorKnight(Position pos, int col) {
 		super(pos, col);
 		symbol = 'E';
 	}
