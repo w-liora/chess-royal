@@ -1,11 +1,13 @@
 package application;
 
 import java.util.ArrayList;
+import messages.CardMessage;
 import java.util.List;
 import javafx.scene.layout.HBox;
 
 import javafx.fxml.FXML;
 import models.LavaSquare;
+import models.Card;
 import javafx.scene.Scene;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
@@ -17,6 +19,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 
@@ -69,6 +72,7 @@ public class ChessBoardCtrl implements Initializable {
 
     // ──────────────── constantes ────────────────
     private static final int TAILLE = 8;          // 8×8
+    private int nbCartesEnnemies = 0;
     private static final int TAILLE_CASE = 75;    // pixels par case
 
     // Répertoire des images (dans src/main/resources/images/)
@@ -87,6 +91,7 @@ public class ChessBoardCtrl implements Initializable {
     private static final int NB_SLOTS_CARTES = 3;
     private static final int LARGEUR_CARTE =140;
     private static final int HAUTEUR_CARTE = 190;
+    private boolean aDejaAgi = false; //Un tour :on peut juste soit piocher une cate, soit applqiuer l'effet soit jouer un coup	
 
     /**
      * Chemin de l'image dos de carte dans resources.
@@ -199,20 +204,33 @@ public class ChessBoardCtrl implements Initializable {
 
         EventHandler<WorkerStateEvent> onSucceed = event -> {
             Message msg = serviceReception.getValue();
-            if (msg != null && msg.getProtocoleMessage() == ProtocoleMessageType.COUP_ECHECS) {
-                CoupEchecs coup = (CoupEchecs) msg.getData();
-                appliquerCoupAdverse(coup);
-            }
-            // Relancer pour écouter le prochain message.
-            serviceReception.restart();
-        };
+            if (msg != null ) {
+            	switch (msg.getProtocoleMessage()) {
+            	 
+                case COUP_ECHECS -> {
+                    CoupEchecs coup = (CoupEchecs) msg.getData();
+                    appliquerCoupAdverse(coup);
+                }
 
-        EventHandler<WorkerStateEvent> onFailed = event -> {
-            labelStatut.setText("Connexion perdue avec le serveur.");
-        };
+                case PRENDRE_CARTE -> {
+                    // L'adversaire a pioché — on affiche le dos de carte côté ennemi
+                    appliquerPiocheAdverse();
+                }
+
+                case APPLIQUER_CARTE -> {
+                    // L'adversaire a joué une carte — on applique l'effet sur notre board
+                    CardMessage action = (CardMessage) msg.getData();
+                    appliquerCarteAdverse(action);
+                }
+
+                default -> { /* message inconnu, on ignore */ }
+            }
+        }
+        serviceReception.restart();
+    };
 
         serviceReception.setOnSucceeded(onSucceed);
-        serviceReception.setOnFailed(onFailed);
+        serviceReception.setOnFailed(event -> labelStatut.setText("Connexion perdue."));
         serviceReception.start();
     }
 
@@ -223,12 +241,16 @@ public class ChessBoardCtrl implements Initializable {
      * @param coup le coup à appliquer.
      */
     private void appliquerCoupAdverse(CoupEchecs coup) {
+        if (aDejaAgi) {
+            aDejaAgi = false;
+            return;
+        }
+
         Piece piece = board[coup.getFromRow()][coup.getFromCol()].getPiece();
         if (piece == null) return;
 
         piece.moveTo(board, coup.getToRow(), coup.getToCol());
 
-        // Promotion éventuelle demandée par l'adversaire.
         if (coup.isPromotion()) {
             Position pos = new Position(coup.getToRow(), coup.getToCol());
             Piece promue = switch (coup.getPromotionSymbol()) {
@@ -241,17 +263,14 @@ public class ChessBoardCtrl implements Initializable {
             board[coup.getToRow()][coup.getToCol()].setPiece(promue);
         }
 
-        // Mettre à jour le tour : après un coup adverse, c'est notre tour.
         rafraichirVue();
-        
+
         if (trouverRoi(couleurLocale) == null) {
-        	rafraichirVue();
-        	terminerpartie(1 - couleurLocale);
-        }
-        else {
-	        monTour = (board[coup.getToRow()][coup.getToCol()].getPiece() != null
-	                           && board[coup.getToRow()][coup.getToCol()].getPiece().getColor() != couleurLocale);
-	        
+            rafraichirVue();
+            terminerpartie(1 - couleurLocale);
+        } else {
+            monTour = true;
+            aDejaAgi = false;
         }
     }
 
@@ -581,50 +600,144 @@ public class ChessBoardCtrl implements Initializable {
      * Cas 4 : clic sur une autre pièce → changer la sélection.
      */
     private void onCaseCliquee(int row, int col) {
-        
-    	if (monTour) {
-	    	// ── Cas 2 : on a une pièce sélectionnée et on clique sur un coup valide ──
-	        if (selectedRow != -1 && estParmisCoups(row, col)) {
-	            int fromRow = selectedRow;
-	            int fromCol = selectedCol;
-	            deplacerPiece(fromRow, fromCol, row, col);
-	            // Après le déplacement (et l'éventuelle promotion), on envoie le coup résultant.
-	            envoyerCoupReseau(fromRow, fromCol, row, col);
-	            monTour = false;
-	            deselectionner();
-	            if (connexion != null) {
-	                labelStatut.setText("Coup envoyé — en attente de l'adversaire…");
-	            }
-	            return;
-	        }
-	
-	        // ── Cas 3 : clic sur la case déjà sélectionnée ──
-	        if (row == selectedRow && col == selectedCol) {
-	            deselectionner();
-	            return;
-	        }
-	
-	        // ── Cas 1 & 4 : sélectionner la pièce sur la case cliquée ──
-	        Piece piece = board[row][col].getPiece();
-	        if (piece != null) {
-	            // En mode réseau : bloquer les pièces de l'adversaire.
-	            if (connexion != null && piece.getColor() != couleurLocale) {
-	                labelStatut.setText("Ce ne sont pas vos pièces !");
-	                return;
-	            }
-	            selectedRow = row;
-	            selectedCol = col;
-	            coupsPossibles = piece.getPossibleMoves(board);
-	            labelStatut.setText(getNomComplet(piece) + " sélectionné(e) — "
-	                    + coupsPossibles.length + " coup(s) possible(s)");
-	            rafraichirVueAvecSelection();
-	        } 
-    	}
-	      else {
-            // Clic sur une case vide sans sélection → rien
+
+        // ── Carte sélectionnée docn le clic = la cible 
+        if (slotCarteSelectionne != -1 && mainJoueur[slotCarteSelectionne] != null) {
+            jouerCarte(slotCarteSelectionne, row, col);
+            return;
+        }
+
+        if (!monTour) {
             deselectionner();
+            return;
+        }
+
+        // ── Cas 2 : pièce sélectionnée + coup valide = on déplace
+        if (selectedRow != -1 && estParmisCoups(row, col)) {
+            if (aDejaAgi) return;
+            int fromRow = selectedRow;
+            int fromCol = selectedCol;
+            deplacerPiece(fromRow, fromCol, row, col);
+            envoyerCoupReseau(fromRow, fromCol, row, col);
+            aDejaAgi = true;
+            monTour = false;
+            deselectionner();
+            if (connexion != null) {
+                labelStatut.setText("Coup envoyé — en attente de l'adversaire…");
+            }
+            return;
+        }
+
+        // ── Cas 3 : clic sur la case déjà sélectionnée = désélectionner ──
+        if (row == selectedRow && col == selectedCol) {
+            deselectionner();
+            return;
+        }
+
+        // ── Cas 1 & 4 : sélectionner une pièce ──
+        Piece piece = board[row][col].getPiece();
+        if (piece != null) {
+            if (connexion != null && piece.getColor() != couleurLocale) {
+            
+                return;
+            }
+            selectedRow = row;
+            selectedCol = col;
+            coupsPossibles = piece.getPossibleMoves(board);
+            labelStatut.setText(getNomComplet(piece) + " sélectionné(e) — "
+                    + coupsPossibles.length + " coup(s) possible(s)");
+            rafraichirVueAvecSelection();
         }
     }
+    //Pour que l'adversaire applqiue l'effet de la carte, on envoie les infos a userveur grace a cette methode
+private void jouerCarte(int slotIdx, int row, int col) {
+    Carte carte = mainJoueur[slotIdx];
+    if (!monTour || aDejaAgi) {
+        return;
+    }
+    aDejaAgi = true;
+    monTour = false;
+ 
+    // Construire la Card models correspondante et appliquer l'effet
+    Card cardModel = creerCardModel(carte.type);
+    if (cardModel != null) {
+        cardModel.apply(board, row, col); 
+    }
+    
+    
+    // Envoyer l'action au serveur pour que l'adversaire applique aussi
+    CardMessage action = new CardMessage(carte.type.ordinal(), row, col);
+    envoyerActionCarte(action, ProtocoleMessageType.APPLIQUER_CARTE);
+
+    // Retirer la carte de la main
+    mainJoueur[slotIdx] = null;
+    slotCarteSelectionne = -1;
+
+    rafraichirSlotsJoueur();
+    rafraichirVue();
+}
+
+/**
+ * Construit la Card models à partir du TypeCarte local.
+ * Ajoute ici tes nouvelles cartes quand tu en crées.
+ */
+private models.Card creerCardModel(TypeCarte type) {
+    return switch (type) {
+        case PAWN_KAMIKAZE       -> new models.CardPawnKamikaze();
+        case BOUNCING_BISHOP     -> new models.CardBouncingBishop();
+        case EXTERMINATOR_KNIGHT -> new models.CardExtarminatorKnight();
+    };
+}
+
+
+private void appliquerCarteAdverse(CardMessage action) {
+    if (aDejaAgi) {
+        aDejaAgi = false;
+        return;
+    }
+
+    TypeCarte type = TypeCarte.values()[action.getNumCard()];
+    models.Card cardModel = creerCardModel(type);
+    if (cardModel != null) cardModel.apply(board, action.getRow(), action.getCol());
+    nbCartesEnnemies--;
+    monTour = true;
+    aDejaAgi = false;
+    labelStatut.setText("L'adversaire a joué une carte — à votre tour !");
+    rafraichirVue();
+}
+
+
+//L'adversaire voit que le dos de la carte evserse
+private void appliquerPiocheAdverse() {
+    if (aDejaAgi) {
+        aDejaAgi = false;
+        return;
+    }
+
+    if (nbCartesEnnemies < NB_SLOTS_CARTES) {
+        Button slot = slotsMainEnnemie.get(nbCartesEnnemies);
+        slot.setDisable(false);
+        setImageBoutonCarte(slot, IMG_DOS_CARTE);
+        slot.setDisable(true);
+        nbCartesEnnemies++;
+    }
+    monTour = true;
+    aDejaAgi = false;
+}
+
+
+
+
+private void envoyerActionCarte(CardMessage action, ProtocoleMessageType type) {
+    if (connexion == null) return;
+    try {
+        connexion.envoyerMessage(new Message(action, type));
+    } catch (IOException e) {
+        labelStatut.setText("Erreur réseau lors de l'envoi de la carte.");
+    }
+}
+   
+
 
     /**
      * Envoie le coup joué au serveur (qui le relayera à l'adversaire).
@@ -919,7 +1032,7 @@ public class ChessBoardCtrl implements Initializable {
 
 
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+
     // ──────────────── utilitaires ────────────────
     private void initialiserDeck() {
         deck.clear();
@@ -935,20 +1048,27 @@ public class ChessBoardCtrl implements Initializable {
     }
     
     private void piocherCarte() {
-        // Trouver un slot libre
+        if (!monTour || aDejaAgi) return;
+        
+        // Trouver un slot libre D'ABORD
         int slotLibre = -1;
         for (int i = 0; i < NB_SLOTS_CARTES; i++) {
             if (mainJoueur[i] == null) { slotLibre = i; break; }
         }
         if (slotLibre == -1) {
-            labelStatut.setText("Main pleine — jouez une carte d'abord !");
-            return;
+  
+            return; // on sort sans changer aDejaAgi ni monTour
         }
         if (deck.isEmpty()) initialiserDeck();
 
+        // On agit seulement si tout est okay
+        aDejaAgi = true;
+        monTour = false;
         Carte carte = deck.poll();
         mainJoueur[slotLibre] = carte;
         rafraichirSlotsJoueur();
+        envoyerActionCarte(new CardMessage(-1, -1, -1), ProtocoleMessageType.PRENDRE_CARTE);
+
     }
     
     private void onSlotCarteClique(int idx) {

@@ -15,6 +15,7 @@ import messages.CoupEchecs;
 import messages.ListeJoueursConnectes;
 import messages.Message;
 import messages.MessageSigne;
+import messages.CardMessage;
 import messages.NouveauJoueur;
 import messages.NumeroCoureur;
 import messages.ProtocoleMessageType;
@@ -116,6 +117,17 @@ public class ServeurEchecs {
                 CoupEchecs coup = (CoupEchecs) ms.getData();
                 GEN.info("Coup reçu : " + coup + " — rediffusion à tous.");
                 serveur.envoyerATous(new Message(coup, ProtocoleMessageType.COUP_ECHECS));
+            }
+            
+            if (ms.getProtocoleMessageType() == ProtocoleMessageType.PRENDRE_CARTE) {
+                // Le serveur prévient les deux joueurs
+                serveur.envoyerATous(new Message(ms.getData(), ProtocoleMessageType.PRENDRE_CARTE));
+            }
+ 
+            if (ms.getProtocoleMessageType() == ProtocoleMessageType.APPLIQUER_CARTE) {
+                CardMessage action = (CardMessage) ms.getData(); //Pour transtyper l'objet en CarDMessage
+                // Le serveur prévient les deux joeurus pour que les effets s'appliquent des 2 cotés
+                serveur.envoyerATous(new Message(action, ProtocoleMessageType.APPLIQUER_CARTE));
             }
         }
 
