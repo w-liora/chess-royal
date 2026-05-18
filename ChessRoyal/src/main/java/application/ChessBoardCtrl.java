@@ -123,7 +123,7 @@ public class ChessBoardCtrl implements Initializable {
     private final Map<String, ImageView> cacheImages = new HashMap<>();
     
     // toutes les cartes
-    private enum TypeCarte { BOUNCING_BISHOP, PAWN_KAMIKAZE, EXTERMINATOR_KNIGHT };
+    private enum TypeCarte { BOUNCING_BISHOP, PAWN_KAMIKAZE, EXTERMINATOR_KNIGHT, LAVA_SQUARE };
     
     //creation de la pile
     private final Queue<Carte> deck = new LinkedList<>();
@@ -424,6 +424,7 @@ public class ChessBoardCtrl implements Initializable {
                 case BOUNCING_BISHOP -> "/images/carte_BouncingBishop.png";
                 case EXTERMINATOR_KNIGHT -> "/images/carte_ExterminatorKnight.png";
                 case PAWN_KAMIKAZE   -> "/images/carte_PawnKamikaze.png";
+                case LAVA_SQUARE -> "/images/carte_LavaSquare.png";
             };
         }
 
@@ -433,6 +434,7 @@ public class ChessBoardCtrl implements Initializable {
                 case BOUNCING_BISHOP -> "Bouncing Bishop";
                 case PAWN_KAMIKAZE   -> "Pion Kamikaze";
                 case EXTERMINATOR_KNIGHT -> "Cavalier Exterminateur";
+                case LAVA_SQUARE -> "Case de lave";
             };
         }
     }
@@ -681,6 +683,7 @@ private models.Card creerCardModel(TypeCarte type) {
         case PAWN_KAMIKAZE       -> new models.CardPawnKamikaze();
         case BOUNCING_BISHOP     -> new models.CardBouncingBishop();
         case EXTERMINATOR_KNIGHT -> new models.CardExterminatorKnight();
+        case LAVA_SQUARE -> new models.CardLavaSquare();
     };
 }
 
@@ -1031,6 +1034,7 @@ private void envoyerActionCarte(CardMessage action, ProtocoleMessageType type) {
             deck.add(new Carte(TypeCarte.BOUNCING_BISHOP));
             deck.add(new Carte(TypeCarte.PAWN_KAMIKAZE));
             deck.add(new Carte(TypeCarte.EXTERMINATOR_KNIGHT));
+            deck.add(new Carte(TypeCarte.LAVA_SQUARE));
         }
         List<Carte> liste = new ArrayList<>(deck);
         Collections.shuffle(liste);
