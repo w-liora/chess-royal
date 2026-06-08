@@ -35,7 +35,7 @@ public class KnightTest {
 		Assertions.assertArrayEquals(board[3][1].getPiece().getPossibleMoves(board), new Position[] {new Position(1,0), new Position(1,2), new Position(2,3)});
 		Assertions.assertArrayEquals(board[1][2].getPiece().getPossibleMoves(board), new Position[] {new Position(3,1), new Position(3,3), new Position(0,0)});
 		
-		//Test de déplacement des caliers
+		//Test de déplacement des cavaliers
 		board[1][2].getPiece().moveTo(board,0,0);
 		Assertions.assertEquals(null, board[1][2].getPiece());
 		Assertions.assertEquals(0, board[0][0].getPiece().getRow());
