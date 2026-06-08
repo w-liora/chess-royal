@@ -41,7 +41,7 @@ public class PawnKamikazeTest {
 		Assertions.assertEquals(null, board[2][0].getPiece());
 		Assertions.assertEquals(null, board[1][0].getPiece());
 		Assertions.assertEquals(null, board[0][0].getPiece());
-		Assertions.assertEquals(null, board[1][1].getPiece()); //Le pion a explsoé donc n'est plus là
+		Assertions.assertEquals(null, board[1][1].getPiece()); //Le pion a explsoé donc n'est plus là, les cases autour sont vides donc les pièces autour ont disparu
 		Assertions.assertEquals(null, board[1][2].getPiece());
 		Assertions.assertEquals(null, board[2][2].getPiece());
 
