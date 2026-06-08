@@ -654,9 +654,6 @@ private void jouerCarte(int slotIdx, int row, int col) {
     if (!monTour || aDejaAgi) {
         return;
     }
-    aDejaAgi = true;
-    monTour = false;
- 
     // Construire la Card models correspondante et appliquer l'effet
     Card cardModel = creerCardModel(carte.type);
     if (cardModel != null) {
@@ -664,13 +661,24 @@ private void jouerCarte(int slotIdx, int row, int col) {
     }
     
     
+
+
+
+ 
+
+
+
+    if (cardModel.click_legal == true) {
     // Envoyer l'action au serveur pour que l'adversaire applique aussi
     CardMessage action = new CardMessage(carte.type.ordinal(), row, col);
     envoyerActionCarte(action, ProtocoleMessageType.APPLIQUER_CARTE);
-
+	
     // Retirer la carte de la main quand on la joue 
     mainJoueur[slotIdx] = null;
     slotCarteSelectionne = -1;
+    aDejaAgi = true;
+    monTour = false;
+    }
 
     rafraichirSlotsJoueur();
     rafraichirVue();
@@ -775,7 +783,7 @@ private void envoyerActionCarte(CardMessage action, ProtocoleMessageType type) {
         if (piece != null) {
             piece.moveTo(board, toRow, toCol);
          // Si la case d'arrivée est une Square, le pion disparait
-            if (board[toRow][toCol] instanceof LavaSquare) {
+            if (board[toRow][toCol] instanceof LavaSquare ) {
                 board[toRow][toCol].effect();
             }
         // Si c'est un pion qui vient de promouvoir → popup de choix

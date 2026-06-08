@@ -5,6 +5,7 @@ import models.Square;
 
 public abstract class Card implements Serializable {
 	String nom;
+	public boolean click_legal;
 	
     protected Card(String nom) {
         this.nom = nom;

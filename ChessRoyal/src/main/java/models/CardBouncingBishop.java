@@ -15,9 +15,10 @@ public class CardBouncingBishop extends Card {
 
         // Il faut cibler un fou existant
         if (!(piece instanceof Bishop)) {
+        	click_legal = false;
             return;
         }
-
+        click_legal = true;
         // On remplace le Bishop par un BouncingBishop de même couleur/position
         Position pos = new Position(row, col);
         BouncingBishop bouncingBishop = new BouncingBishop(pos, piece.getColor());

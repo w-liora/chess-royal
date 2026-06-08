@@ -12,8 +12,10 @@ public class CardPawnKamikaze extends Card {
 
 	    // Vérifier que la case contient bien un pion 
 	    if (!(piece instanceof Pawn)) {
+	    	click_legal = false;
 	        return; // on fait rien 
 	    }
+	    click_legal = true;
 	    Position pos = new Position(row, col);
 
 	    // Remplacer le Pawn par un PawnKamikaze au même endroit
