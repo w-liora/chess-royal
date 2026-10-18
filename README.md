@@ -34,5 +34,4 @@ Remarque : Images de*.png générées par IA
 
 
 
-## Version en ligne, avec interface graphique
-à venir
+
