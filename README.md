@@ -31,6 +31,9 @@ Celui-ci implémente toutes les fonctionnalités d'un jeu d'échec  classique, �
 
 Remarque : Images de*.png générées par IA
 
+<img width="495" height="279" alt="Capture d&#39;écran 2026-10-19 193400" src="https://github.com/user-attachments/assets/7581ccaf-9f1f-4fae-9f57-a4e01365b26a" />
+
+
 
 
 
