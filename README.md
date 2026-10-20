@@ -1,4 +1,4 @@
-# PRO3600-26-RAD-25 - Chess royal
+# PRO3600-26-RAD-25 - Chess royal - Travail en équipe
 
 Jeu d'échecs en réseau à deux joueurs (JavaFX + TCP)
 
